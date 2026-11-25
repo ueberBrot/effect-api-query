@@ -910,18 +910,17 @@
       ]
     },
     "source:vite.config.ts": {
-      "fingerprint": "b3fb5884e86ed0b7688943d3e87742bae94deb1da76f7c2dea39f98f9c106267",
+      "fingerprint": "cd4bbd3728b42515d7524e1c2cfbe94e446a5e1fec2021e64a900d9525ad2953",
       "snapshot": {
-        "vite.config.ts": "455255d540aee86c6cb250c5eabab29adffef86c14272b0e712aa504b67180f5"
+        "vite.config.ts": "4f0aeb52ea5df6f1e31af260d8b347f1c09ff14502ba557f330121a41576b034"
       },
-      "head": "468e21895d1f391a2fc5eff5546b07dd2d4762b3",
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
       "outcome": "no-change",
-      "reason": "The verifier uses the same scoped input-validation lint exception as the original release script. There is no change to public behavior or consumer guidance.",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
       "evidence": [
-        "75 tests in tests/docs-release.test.ts passed",
-        "Standalone 0.8.0 verifier passed with only the restored docs and script",
-        "Manual resolution confirmed the 0.8.0 npm record and Git tag",
-        "actionlint and yamllint passed"
+        "Reviewed vite.config.ts at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
       ]
     },
     "source:.github/workflows/release.yml": {
@@ -4909,6 +4908,132 @@
       "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
       "evidence": [
         "Reviewed .changeset/poll-ready-stream-publication-pulls.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+      ]
+    },
+    "source:.deepsec/.gitignore": {
+      "fingerprint": "468568a24e7b1a8efc97a8b50a590ebc36eabeca63c6a9ad92e1eada10725ef6",
+      "snapshot": {
+        ".deepsec/.gitignore": "9e1727da756db977d646c52ef4009e98ceddf3087fd59610c2ac8c94f01b735b"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/.gitignore at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/AGENTS.md": {
+      "fingerprint": "02100269314794be9fa565f19efb5b6261e121b22ef95f94785a4851088a6506",
+      "snapshot": {
+        ".deepsec/AGENTS.md": "9e6b26a8e7f09ccf5d3d32e0b2c3c8a66a5da6c0aaf81bdab95ee1f7faa50a1a"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/AGENTS.md at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/README.md": {
+      "fingerprint": "d423ba3b3955c8fc757868128e8e22d7a4c0da6ceb8a5b1fdd3a607640eba7e1",
+      "snapshot": {
+        ".deepsec/README.md": "f3b0e6f5fb2b47e84b900900cd32c8d4e7cf9fcc2de297774fed29ffc9d83ada"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/README.md at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/data/effect-api-query/INFO.md": {
+      "fingerprint": "c06682db706fd5e212ed6312cbe82a0fa175c9249b36cb545c92697f7ff50153",
+      "snapshot": {
+        ".deepsec/data/effect-api-query/INFO.md": "e086566f550118e1dd67350be7f9b025a63be8ddf88d578b26cb42941a0c7912"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/data/effect-api-query/INFO.md at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/data/effect-api-query/SETUP.md": {
+      "fingerprint": "7787369dee9af135f04700de43c42374fa9f6ba7caa034a3f765e3d7c180c13e",
+      "snapshot": {
+        ".deepsec/data/effect-api-query/SETUP.md": "d7de7df7408125ac15f96a6bf6ee0067f618225df3a0ed8547bb2047f1bb5abd"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/data/effect-api-query/SETUP.md at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/deepsec.config.ts": {
+      "fingerprint": "3447a5b01d30b57419d5fc2c7d3079878dd10b30c81ce40df91f7c97afd3ceea",
+      "snapshot": {
+        ".deepsec/deepsec.config.ts": "872bf296c6470831108a3f456753469363b273576fdb0293a8a081c1de65dd92"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/deepsec.config.ts at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/generated-matchers.ts": {
+      "fingerprint": "1f19d818c342582161c572b37366bf583e54cb5712ab9d6759902d0522c27e1c",
+      "snapshot": {
+        ".deepsec/generated-matchers.ts": "094e8dbff3982fbe4673b08ef4f80214b831ea7eeba15474d7f9c9952a593ff4"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/generated-matchers.ts at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/pnpm-lock.yaml": {
+      "fingerprint": "82ef6e9be4e01e93e7fb91a238cf8d9fb4cab4d1b82499e2ac49b654be5eb56e",
+      "snapshot": {
+        ".deepsec/pnpm-lock.yaml": "7a0948e61efbb9b49db81e19036977e4aa8678fd3737a6cd626e476e7997aff9"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/pnpm-lock.yaml at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
+      ]
+    },
+    "source:.deepsec/pnpm-workspace.yaml": {
+      "fingerprint": "e3423ea48d8e876c00df4379bd5d6bf74201d728dd9b62524d9aed4fc4d5bd76",
+      "snapshot": {
+        ".deepsec/pnpm-workspace.yaml": "1b5ed0870ac998395e55cd67d45832a4f5f1fd72beedf82571963dad6fc8962a"
+      },
+      "head": "260e72bb9cca583336e9e8318bfdffe531c1ec4e",
+      "outcome": "no-change",
+      "reason": "DeepSec configures repository-local review tooling. The diff leaves library exports, runtime behavior, consumer setup, and the six existing skill references accurate.",
+      "evidence": [
+        "Reviewed .deepsec/pnpm-workspace.yaml at 260e72b against c3d97c2.",
+        "The package allowlist still ships dist, skills, and CHANGELOG.md. The domain map, skill spec, and skill tree still cover the same contract-query tasks and sources.",
+        "A clean frozen install, local pattern scan, status task, repository check, skill validation, and 27 workflow and skill-maintenance tests passed."
       ]
     }
   }
