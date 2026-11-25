@@ -2,7 +2,7 @@ import { replaceEqualDeep } from "@tanstack/query-core";
 import type { QueryFunctionContext } from "@tanstack/query-core";
 import { Predicate } from "effect";
 
-import type { UnaryOperation } from "./operation";
+import type { MetadataOperation } from "./operation";
 import { executeBuffered } from "./runtime";
 import type { RunPromiseExit } from "./types";
 
@@ -131,7 +131,7 @@ export const preserveMetadataPolicy = <Data>(
 };
 
 export const prepareMetadataExecution = (
-  description: NonNullable<UnaryOperation["metadata"]>,
+  description: MetadataOperation,
 
   options: Record<string, unknown>,
   runPromiseExit: RunPromiseExit<unknown>,

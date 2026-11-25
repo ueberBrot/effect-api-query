@@ -5,7 +5,6 @@ import { createBranchFilter } from "./branch-filter";
 import type { FilterPath } from "./branch-filter";
 import { registerMutationBuilder, registerQueryBuilder } from "./configure";
 import type { QueryView } from "./inference";
-import { prepareMetadataExecution } from "./metadata-query";
 import type {
   BufferedOperation,
   MutationOperation,
@@ -405,9 +404,9 @@ const createUnaryBuilders = (
           ),
     })
   );
-  const { metadata } = description;
+  const { prepareMetadata } = description;
   const metadataQuery =
-    metadata === undefined
+    prepareMetadata === undefined
       ? undefined
       : createQueryBuilders(
           description,
@@ -415,8 +414,7 @@ const createUnaryBuilders = (
           owner,
           (options, requestOptions, input) => ({
             identity: [],
-            makeQuery: prepareMetadataExecution(
-              metadata,
+            makeQuery: prepareMetadata(
               options,
               runPromiseExit,
               requestOptions,
@@ -550,7 +548,7 @@ const operationViews = (
   if (operation.kind === "Streaming") {
     return ["live", "streamed"];
   }
-  return operation.metadata === undefined
+  return operation.prepareMetadata === undefined
     ? ["query", "infinite"]
     : ["query", "infinite", "metadata"];
 };
@@ -570,7 +568,11 @@ const insertLeaf = (
   };
   let branch = tree;
   branch.paths.push(filterPath);
-  for (const [index, segment] of segments.slice(0, -1).entries()) {
+  for (let index = 0; index < segments.length - 1; index += 1) {
+    const segment = segments[index];
+    if (segment === undefined) {
+      continue;
+    }
     let child = branch.children.get(segment);
     if (child === undefined) {
       child = buildBranch(

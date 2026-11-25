@@ -10,7 +10,7 @@ import type {
   QueryObserverOptions,
   SkipToken,
 } from "@tanstack/query-core";
-import type { Effect, Exit, Redacted } from "effect";
+import type { Effect, Exit, Redacted, Types } from "effect";
 
 import type { PreparedInput } from "./prepared-input";
 
@@ -841,22 +841,27 @@ export type MutationBuilder<
 ) => MutationOptions<Data, Error, Input, Key, OnMutateResult>;
 
 export type HasSeenType<A, Seen> = Seen extends unknown
-  ? (<T>() => T extends A ? 1 : 2) extends <T>() => T extends Seen ? 1 : 2
-    ? true
-    : false
+  ? Types.Equals<A, Seen>
   : never;
 
-export type ContainsRedacted<A, Seen = never> =
-  A extends Redacted.Redacted<unknown>
+export type ContainsRedacted<A, Seen = never> = A extends object
+  ? A extends Redacted.Redacted<unknown>
     ? true
-    : true extends HasSeenType<A, Seen>
-      ? false
-      : A extends readonly (infer Value)[]
-        ? ContainsRedacted<Value, Seen | A>
-        : A extends object
-          ? true extends {
-              readonly [Key in keyof A]: ContainsRedacted<A[Key], Seen | A>;
+    : [Seen] extends [never]
+      ? A extends readonly (infer Value)[]
+        ? ContainsRedacted<Value, A>
+        : true extends {
+              readonly [Key in keyof A]: ContainsRedacted<A[Key], A>;
             }[keyof A]
+          ? true
+          : false
+      : true extends HasSeenType<A, Seen>
+        ? false
+        : A extends readonly (infer Value)[]
+          ? ContainsRedacted<Value, Seen | A>
+          : true extends {
+                readonly [Key in keyof A]: ContainsRedacted<A[Key], Seen | A>;
+              }[keyof A]
             ? true
             : false
-          : false;
+  : false;

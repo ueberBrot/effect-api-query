@@ -39,6 +39,18 @@ const batchStream = <A, E, R>(
         | undefined;
       let terminalCause: Cause.Cause<E | Cause.Done> | undefined;
 
+      const directPull = Effect.exit(
+        pull.pipe(
+          Effect.onExit((pullExit) =>
+            Effect.sync(() => {
+              if (Exit.isFailure(pullExit)) {
+                terminalCause = pullExit.cause;
+              }
+            })
+          )
+        )
+      );
+
       const clearDeadline = Effect.suspend(() => {
         const fiber = deadline?.fiber;
         deadline = undefined;
@@ -102,19 +114,40 @@ const batchStream = <A, E, R>(
       });
 
       const pullOrWaitDeadline = Effect.gen(function* pullOrDeadline() {
+        const gate = deadline?.gate;
+        if (pendingPull === undefined && gate === undefined) {
+          const exit = yield* directPull;
+          return { _tag: "Pull" as const, exit };
+        }
+
         let activePull = pendingPull;
         if (activePull === undefined) {
           activePull = yield* Effect.forkIn(pull, scope, {
             startImmediately: true,
           });
+          const polled = activePull.pollUnsafe();
+          if (polled !== undefined) {
+            return { _tag: "Pull" as const, exit: polled };
+          }
           pendingPull = activePull;
+        } else {
+          const polled = activePull.pollUnsafe();
+          if (polled !== undefined) {
+            pendingPull = undefined;
+            return { _tag: "Pull" as const, exit: polled };
+          }
         }
-        const gate = deadline?.gate;
+
         if (gate === undefined) {
           const exit = yield* Fiber.await(activePull);
           pendingPull = undefined;
           return { _tag: "Pull" as const, exit };
         }
+
+        if (Deferred.isDoneUnsafe(gate)) {
+          return { _tag: "Deadline" as const };
+        }
+
         const outcome = yield* Effect.raceFirst(
           Fiber.await(activePull).pipe(
             Effect.map((exit) => ({ _tag: "Pull" as const, exit }))

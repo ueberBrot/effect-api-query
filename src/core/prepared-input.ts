@@ -43,6 +43,9 @@ export const prepareQueryInput = (
     throw new TypeError("skipToken is only supported by query options");
   }
   const prepared = owner.prepare(input, encoder);
+  if (prepared.canonical === true) {
+    return { input: prepared.input, keyValue: prepared.keyValue };
+  }
   try {
     return { input: prepared.input, keyValue: canonicalize(prepared.keyValue) };
   } catch (error) {

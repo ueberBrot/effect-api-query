@@ -44,8 +44,12 @@ const createBuilderRegistry = <Base extends object>() => {
   };
 };
 
-const queryBuilderRegistry = createBuilderRegistry<RuntimeQueryBuilder>();
-const mutationBuilderRegistry = createBuilderRegistry<RuntimeMutationBuilder>();
+const queryBuilderRegistry =
+  /* @__PURE__ */
+  createBuilderRegistry<RuntimeQueryBuilder>();
+const mutationBuilderRegistry =
+  /* @__PURE__ */
+  createBuilderRegistry<RuntimeMutationBuilder>();
 
 export const registerQueryBuilder = queryBuilderRegistry.register;
 export const registerMutationBuilder = mutationBuilderRegistry.register;

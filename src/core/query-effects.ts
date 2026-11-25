@@ -32,11 +32,14 @@ type ExecutableOptions<Options extends { queryFn?: unknown }> = Options & {
   readonly queryFn?: Exclude<Options["queryFn"], SkipToken>;
 };
 
+const QueryClientServiceBase =
+  /* @__PURE__ */
+  Context.Service<QueryClientService, QueryClient>()(
+    "@ueberbrot/effect-api-query/QueryClientService"
+  );
+
 /** The existing application cache; providing it does not acquire or dispose resources. */
-export class QueryClientService extends Context.Service<
-  QueryClientService,
-  QueryClient
->()("@ueberbrot/effect-api-query/QueryClientService") {}
+export class QueryClientService extends QueryClientServiceBase {}
 
 const QueryClientOperationErrorBase =
   /* @__PURE__ */
