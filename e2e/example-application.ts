@@ -26,7 +26,7 @@ export const exampleTest = base.extend<{
         [exampleHost],
         {
           env: { ...process.env, EXAMPLE_WRITE_TOKEN: writeToken },
-          execArgv: ["--import", "tsx"],
+          execArgv: [],
           stdio: ["ignore", "ignore", "inherit", "ipc"],
         }
       );

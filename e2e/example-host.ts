@@ -1,11 +1,8 @@
 import { once } from "node:events";
 import { fileURLToPath } from "node:url";
 
-import { Effect, Exit, Scope } from "effect";
 import { preview } from "vite";
 import type { PreviewOptions } from "vite";
-
-import { startExampleRpcServer } from "../examples/server/src/index.ts";
 
 if (process.send === undefined) {
   throw new Error("The example host requires a Playwright IPC channel");
@@ -24,7 +21,7 @@ const servePreview = async (
     const proxy = { target: apiTarget, changeOrigin: false };
     options.proxy = { "/api": proxy, "/rpc": proxy };
   }
-  const server = await preview({ preview: options });
+  const server = await preview({ configLoader: "native", preview: options });
   try {
     const address = server.resolvedUrls?.local[0];
     if (address === undefined) {
@@ -42,6 +39,9 @@ const servePreview = async (
 if (process.argv[2] === "start") {
   await servePreview("tanstack-start");
 } else {
+  const { Effect, Exit, Scope } = await import("effect");
+  const { startExampleRpcServer } =
+    await import("../examples/server/src/index.ts");
   const scope = Scope.makeUnsafe();
   try {
     const server = await Effect.runPromise(
