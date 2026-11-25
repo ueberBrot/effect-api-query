@@ -1489,24 +1489,43 @@ describe("HTTP semantic keys", () => {
       keyPrefix: ["regression"],
     });
 
-    expect(
-      regressionUtils.effectHeaders
+    // oxlint-disable-next-line typescript/no-unsafe-assignment
+    const inheritedQueryInput: {
+      readonly query: Option.Option<{ readonly page: number }>;
+    } = Object.create({ query: Option.some({ page: 2 }) });
+
+    expect({
+      effectHeaders: regressionUtils.effectHeaders
         .queryKey({
           input: { headers: Headers.fromInput({ "X-Token": "public" }) },
         })
-        .at(-1)
-    ).toStrictEqual({
-      headers: { "x-token": "public" },
-    });
-
-    expect(
-      regressionUtils.classHeaders
+        .at(-1),
+      classHeaders: regressionUtils.classHeaders
         .queryKey({
           input: { headers: makeHeaderBag("public") },
         })
-        .at(-1)
-    ).toStrictEqual({
-      headers: { "x-token": "public" },
+        .at(-1),
+      optionalNone: regressionUtils.optionalQuery
+        .queryKey({
+          input: { query: Option.none() },
+        })
+        .at(-1),
+      optionalSome: regressionUtils.optionalQuery
+        .queryKey({
+          input: { query: Option.some({ page: 2 }) },
+        })
+        .at(-1),
+      inheritedQuery: regressionUtils.optionalQuery.queryKey({
+        input: inheritedQueryInput,
+      }),
+    }).toStrictEqual({
+      effectHeaders: { headers: { "x-token": "public" } },
+      classHeaders: { headers: { "x-token": "public" } },
+      optionalNone: {},
+      optionalSome: { query: { page: "2" } },
+      inheritedQuery: regressionUtils.optionalQuery.queryKey({
+        input: { query: Option.some({ page: 2 }) },
+      }),
     });
 
     expect(() =>
@@ -1514,23 +1533,5 @@ describe("HTTP semantic keys", () => {
         input: { headers: makeHeaderBag("public", undefined, true) },
       })
     ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
-
-    expect(
-      regressionUtils.optionalQuery
-        .queryKey({
-          input: { query: Option.none() },
-        })
-        .at(-1)
-    ).toStrictEqual({});
-
-    expect(
-      regressionUtils.optionalQuery
-        .queryKey({
-          input: { query: Option.some({ page: 2 }) },
-        })
-        .at(-1)
-    ).toStrictEqual({
-      query: { page: "2" },
-    });
   });
 });

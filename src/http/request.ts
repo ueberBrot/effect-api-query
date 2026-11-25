@@ -318,9 +318,7 @@ const requestKeyEncoding = (
       // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
       const encoded: Record<string, unknown> = {};
       for (const [part, encoding] of encoders) {
-        const partInput = Object.hasOwn(input, part)
-          ? { [part]: input[part] }
-          : {};
+        const partInput = part in input ? { [part]: input[part] } : {};
         const partEncoded = encoding.encode(partInput);
         if (
           Predicate.isObject(partEncoded) &&

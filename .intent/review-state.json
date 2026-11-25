@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "3b5ae5f0507070cfebf952273a7757c009770a349686d0028a314e6df6493257",
+      "fingerprint": "bf0ddaa37ff2be011547202f8549b84f7e1298d42b55898efce3ce6281ad6b8c",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -285,7 +285,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "6d3c0c0486795cd1e97dab87998acd74ce5c69196371573cb837fc10e23056ff",
-        "src/http/request.ts": "6cf4770c0246c93a4c562fa2ee3a059e0b86c2fca95a95401dd44fc4a46e672e",
+        "src/http/request.ts": "32e7e858f0f38ee3d7ffc43f40a5411bba729521c86c977c6caa8c1a405b27d1",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "9d442530d02d92a04589124f63de0750fb01c2e7874eff8150ce445616dbb3c1",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
@@ -342,7 +342,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "b612179bf892c102c7d5157e035d5a9c004fbcd42f1831f7e805ab68eb6a72b9",
-        "tests/http-semantic-keys.test.ts": "be58aac982258c3033958d6c44578db9fc0b0a4380e5250362cd4353705f37d1",
+        "tests/http-semantic-keys.test.ts": "2bec08c45983c1008788af667959e975c89b118c408494d2fc6f09a7ce99c35a",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "a3a0333df4f8a5ceb5fe0148d45d756474886564e65bb07ad5555a0b34f5b6fa",
@@ -444,15 +444,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
+      "head": "5df070566686e6e177ba5b1a2ce61c0f032693ac",
       "outcome": "no-change",
-      "reason": "Internal type-checker, runtime, and tree-shaking performance optimizations and regression tests preserve all public API contracts and usage guidance.",
+      "reason": "Preserve inherited HTTP request-part lookup in cached single-property struct encoding without changing public API or guidance.",
       "evidence": [
-        "vp check, fallow, api-types, server-local-types, framework-types, tightened type budgets, and regression tests pass without public API or usage changes."
+        "vp check, fallow, and tests/http-semantic-keys.test.ts (including inherited query regression) pass."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "47b9853a3d6d123fcbbc760a1e0d5dbcb938ceb72ba20262ed506addcfd05168",
+      "fingerprint": "33185dc12eef0111b2dcc2e5f258e4605831b0d202cb56daa602f13b61373f78",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -737,7 +737,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "6d3c0c0486795cd1e97dab87998acd74ce5c69196371573cb837fc10e23056ff",
-        "src/http/request.ts": "6cf4770c0246c93a4c562fa2ee3a059e0b86c2fca95a95401dd44fc4a46e672e",
+        "src/http/request.ts": "32e7e858f0f38ee3d7ffc43f40a5411bba729521c86c977c6caa8c1a405b27d1",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "9d442530d02d92a04589124f63de0750fb01c2e7874eff8150ce445616dbb3c1",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
@@ -794,7 +794,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "b612179bf892c102c7d5157e035d5a9c004fbcd42f1831f7e805ab68eb6a72b9",
-        "tests/http-semantic-keys.test.ts": "be58aac982258c3033958d6c44578db9fc0b0a4380e5250362cd4353705f37d1",
+        "tests/http-semantic-keys.test.ts": "2bec08c45983c1008788af667959e975c89b118c408494d2fc6f09a7ce99c35a",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "a3a0333df4f8a5ceb5fe0148d45d756474886564e65bb07ad5555a0b34f5b6fa",
@@ -896,11 +896,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
+      "head": "5df070566686e6e177ba5b1a2ce61c0f032693ac",
       "outcome": "no-change",
-      "reason": "Domain boundaries and skill tree coverage remain unchanged by internal performance optimizations and review fixes.",
+      "reason": "Domain boundaries and skill tree coverage remain unchanged by the inherited-property lookup fix.",
       "evidence": [
-        "No public exports, adapters, error contracts, or workflow patterns changed across src/ or tests/."
+        "Internal change limited to src/http/request.ts and tests/http-semantic-keys.test.ts."
       ]
     },
     "source:vite.config.ts": {
