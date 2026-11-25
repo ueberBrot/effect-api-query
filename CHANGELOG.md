@@ -1,5 +1,43 @@
 # effect-api-query
 
+## 0.9.0
+
+### Minor Changes
+
+- [#262](https://github.com/ueberBrot/effect-api-query/pull/262) [`1182c6e`](https://github.com/ueberBrot/effect-api-query/commit/1182c6ef98905c07c842e6538e842ff6f254901c) - Isolate generated RPC and HTTP cache namespaces with versioned keys. Root and branch filters and native prefix defaults now match the entire caller key prefix, including objects and arrays, while still matching descendants.
+
+  Upgrade the version or buster for persisted TanStack caches and discard snapshots with the old generated keys. Deploy matching versions on both sides of SSR and rebuild any hand-authored keys using the generated builders. Legacy keys can be ambiguous, so they cannot be migrated automatically.
+
+- [#254](https://github.com/ueberBrot/effect-api-query/pull/254) [`6c2e9be`](https://github.com/ueberBrot/effect-api-query/commit/6c2e9be685ab2afd861a4f6f2fc104319bf7acd3) - `createContractHydrationRegistry` omits HTTP `metadata` codecs by default so unfiltered server-only response headers do not enter browser snapshots. Opt into derived metadata hydration with an explicit allowlist (`views: { metadata: { headers: [...] } }` or `paths[path].metadata: { headers: [...] }`) or supply a custom metadata codec.
+
+- [#252](https://github.com/ueberBrot/effect-api-query/pull/252) [`38d7d43`](https://github.com/ueberBrot/effect-api-query/commit/38d7d433661ed701518acda559d9bb1f0031c2cd) - HTTP utility construction requires a custom key encoder when declared headers, query parameters, or URL-encoded non-body payloads match `HttpApi.RedactedNames` at the API, group, or endpoint level. Supply a safe `keyEncoders` entry or move credentials to transport middleware so annotated secrets do not enter canonical keys or dehydrated snapshots.
+
+### Patch Changes
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Screen incoming values and cache plain array and object metadata once per pass in `schemaStructuralSharing`. Reusing container metadata across cycle detection, atom screening, and recursive sharing avoids repeated descriptor and own-key scans.
+
+- [#260](https://github.com/ueberBrot/effect-api-query/pull/260) [`a2357f7`](https://github.com/ueberBrot/effect-api-query/commit/a2357f7399af76bfd0c1a0134e348e63ba707335) - Clear seeded RPC and HTTP accumulated stream data when a reset refetch starts. The query enters pending without cached data, and a failure before the first emission leaves the data cleared.
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Decouple HTTP metadata query preparation from the shared utility tree and mark `QueryClientService` and builder registries as pure. Bundlers now drop unused HTTP metadata and structural-sharing helpers from RPC-only and minimal consumer bundles.
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Poll ready stream pulls and completed deadline gates before awaiting or racing during stream publication, reducing per-chunk overhead in batched and coalesced streams.
+
+- [#254](https://github.com/ueberBrot/effect-api-query/pull/254) [`6c2e9be`](https://github.com/ueberBrot/effect-api-query/commit/6c2e9be685ab2afd861a4f6f2fc104319bf7acd3) - Contract-derived hydration derives `HttpApiSchema.asNoContent` codecs from the decoded schema so cached synthesized values round-trip across `query`, `metadata.data`, and `infinite.pages` without re-invoking the `asNoContent` factory. Plain `NoContent` responses continue to normalize to `null`.
+
+- [#258](https://github.com/ueberBrot/effect-api-query/pull/258) [`033bfdd`](https://github.com/ueberBrot/effect-api-query/commit/033bfddb8e0dcdc595fc7dad24aaf1f93a81f1cd) - Preserve all raw response header names as own properties when HTTP metadata queries refetch with default structural sharing. Freeze interceptor replacement and fallback envelopes and their header snapshots for both imperative fetches and cached results.
+
+- [#252](https://github.com/ueberBrot/effect-api-query/pull/252) [`38d7d43`](https://github.com/ueberBrot/effect-api-query/commit/38d7d433661ed701518acda559d9bb1f0031c2cd) - Canonical HTTP request keys preserve repeated wire-parameter ordering when multiple URL-encoded entries flatten to the same serialized parameter name across query parameters, non-body payloads, or form-urlencoded payloads. Order-independent fixed-struct inputs keep their existing canonical keys.
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Reduce TypeScript instantiations for large RPC and HTTP utility trees. Standard `HttpApiClient.ForApi` clients and untouched groups bypass per-endpoint service and error derivation, prefixed `createRpcQueryUtils` calls match before unprefixed overloads, `ContainsRedacted` exits immediately on primitives, and sparse `configureUtils` retention and hydration helpers prune untouched branches.
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Replace serialized path collision keys with a segment trie during utility tree construction, scan segments without intermediate slices, and build HTTP error-mapping structures only when needed.
+
+- [#254](https://github.com/ueberBrot/effect-api-query/pull/254) [`6c2e9be`](https://github.com/ueberBrot/effect-api-query/commit/6c2e9be685ab2afd861a4f6f2fc104319bf7acd3) - Contract-derived hydration inspects decoded schema children, declaration type parameters (such as `Option<RedactedFromValue>`), and suspended schemas for `Redacted` values and throws `HydrationCodecError` (`UnencodableSchema`) unless overridden or opted out with `false`.
+
+- [#259](https://github.com/ueberBrot/effect-api-query/pull/259) [`bca2fed`](https://github.com/ueberBrot/effect-api-query/commit/bca2fed98b7bf479d16fcf01e95a339cd3722478) - Screen arrays before Schema validation and equivalence during opt-in structural sharing. Reject incoming cycles through supported containers before callbacks and check each shared container once during cycle detection.
+
+- [#275](https://github.com/ueberBrot/effect-api-query/pull/275) [`8863dd7`](https://github.com/ueberBrot/effect-api-query/commit/8863dd744480d8f806137c48cb49938df24de171) - Build canonical HTTP request keys without copying the whole request twice. Compare duplicate header values with Effect structural equality instead of serializing JSON, reuse default request-part schema encoders across endpoints, and skip allocating cycle trackers for primitive key values.
+
 ## 0.8.0
 
 ### Minor Changes
