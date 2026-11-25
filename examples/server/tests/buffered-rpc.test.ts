@@ -1,8 +1,7 @@
 // @effect-diagnostics unstableApiUsage:off
-import { SeedUser } from "@effect-api-query/contracts";
 import { makeExampleWebHandler } from "@effect-api-query/server/web-handler";
 import { describe, expect, it } from "@effect/vitest";
-import { Context, Deferred, Effect, Layer, Schema, Scope } from "effect";
+import { Deferred, Effect, Layer, Schema } from "effect";
 
 import { ExampleDomain } from "../src/domain.ts";
 
@@ -84,37 +83,43 @@ describe("example buffered RPC limits", () => {
     "counts exact UTF-8 bytes across JSON replies, including escaping and separators",
     () =>
       Effect.gen(function* verifyResponseBytes() {
-        const scope = yield* Scope.Scope;
-        const context = yield* Layer.buildWithScope(ExampleDomain.layer, scope);
-        const { users } = Context.get(context, ExampleDomain);
-        const handle = yield* makeExampleWebHandler(
-          Layer.succeedContext(context)
-        );
+        const baseReply = 'é😀"\n';
+        let padding = ["", ""];
+        const layer = Layer.effect(
+          ExampleDomain,
+          Effect.gen(function* provideReplies() {
+            const domain = yield* ExampleDomain;
+            return {
+              ...domain,
+              diagnostics: {
+                ...domain.diagnostics,
+                slow: ({ operationId }: { readonly operationId?: string }) =>
+                  Effect.sync(
+                    () => baseReply + (padding[Number(operationId)] ?? "")
+                  ),
+              },
+            };
+          })
+        ).pipe(Layer.provide(ExampleDomain.layer));
+        const handle = yield* makeExampleWebHandler(layer);
         const batch = [
-          rpc(0, "users.get", { id: 1 }),
-          rpc(1, "users.get", { id: 2 }),
+          rpc(0, "diagnostics.slow", { operationId: "0" }),
+          rpc(1, "diagnostics.slow", { operationId: "1" }),
         ];
-        const name = 'é😀"\n';
         const send = Effect.promise(async () => await handle(postRpc(batch)));
 
-        yield* users.seed({
-          users: [new SeedUser({ name }), new SeedUser({ name })],
-        });
         const initial = yield* send;
         expect(initial.status).toBe(200);
         const baseline = yield* Effect.promise(
           async () => await initial.arrayBuffer()
         );
 
-        const padding = maxBufferedRpcResponseBytes - baseline.byteLength;
-        const fill = "é".repeat(Math.floor(padding / 4));
-        const remainder = padding - 4 * fill.length;
-        yield* users.seed({
-          users: [
-            new SeedUser({ name: name + fill }),
-            new SeedUser({ name: name + fill + "a".repeat(remainder) }),
-          ],
-        });
+        const remainingBytes =
+          maxBufferedRpcResponseBytes - baseline.byteLength;
+        const fill = "é".repeat(Math.floor(remainingBytes / 4));
+        const remainder = remainingBytes - 4 * fill.length;
+        const secondReplyPadding = fill + "a".repeat(remainder);
+        padding = [fill, secondReplyPadding];
         const exact = yield* send;
         expect(exact.status).toBe(200);
         const bytes = yield* Effect.promise(
@@ -123,12 +128,7 @@ describe("example buffered RPC limits", () => {
         expect(bytes.byteLength).toBe(maxBufferedRpcResponseBytes);
         expect(yield* readReplies(exact)).toHaveLength(2);
 
-        yield* users.seed({
-          users: [
-            new SeedUser({ name: name + fill }),
-            new SeedUser({ name: name + fill + "a".repeat(remainder + 1) }),
-          ],
-        });
+        padding = [fill, `${secondReplyPadding}a`];
         const refused = yield* Effect.promise(
           async () => await handle(postRpc(batch))
         );
@@ -159,28 +159,27 @@ describe("example buffered RPC limits", () => {
                     Deferred.succeed(started, null),
                     Effect.never
                   ).pipe(Effect.ensuring(Deferred.succeed(finished, null))),
-                list: () =>
-                  Effect.andThen(Deferred.await(started), domain.users.list()),
+              },
+              diagnostics: {
+                ...domain.diagnostics,
+                slow: () =>
+                  Effect.as(
+                    Deferred.await(started),
+                    "é".repeat(maxBufferedRpcResponseBytes / 2)
+                  ),
               },
             };
           })
         ).pipe(Layer.provide(ExampleDomain.layer));
-        const scope = yield* Scope.Scope;
-        const context = yield* Layer.buildWithScope(layer, scope);
-        const { users } = Context.get(context, ExampleDomain);
-        yield* users.seed({
-          users: [
-            new SeedUser({ name: "é".repeat(maxBufferedRpcResponseBytes / 2) }),
-          ],
-        });
-        const handle = yield* makeExampleWebHandler(
-          Layer.succeedContext(context)
-        );
+        const handle = yield* makeExampleWebHandler(layer);
 
         const received = yield* Effect.promise(
           async () =>
             await handle(
-              postRpc([rpc(0, "users.get", { id: 1 }), rpc(1, "users.list")])
+              postRpc([
+                rpc(0, "users.get", { id: 1 }),
+                rpc(1, "diagnostics.slow", {}),
+              ])
             )
         );
         expect(received.status).toBe(413);

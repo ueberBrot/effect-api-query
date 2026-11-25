@@ -92,15 +92,14 @@ describe("plain Vite React integration", () => {
   });
 
   it("restores the selected user when deletion is unauthorized", async () => {
-    await expect(screen.findByText("Edsger Dijkstra")).resolves.toBeDefined();
-
-    fireEvent.click(
-      screen.getByRole("button", { name: "Delete Edsger Dijkstra" })
-    );
+    const deleteUser = { name: "Delete Edsger Dijkstra", exact: true };
+    fireEvent.click(await screen.findByRole("button", deleteUser));
 
     const alert = await screen.findByRole("alert");
     expect(alert.textContent).toContain("users.delete");
-    expect(screen.getByText("Edsger Dijkstra")).toBeDefined();
+    await expect(
+      screen.findByRole("button", deleteUser)
+    ).resolves.toBeDefined();
   });
 
   it("adds HTTP user details across both adapter views", async () => {

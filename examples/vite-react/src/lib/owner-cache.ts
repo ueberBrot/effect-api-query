@@ -1,4 +1,4 @@
-import { User } from "@effect-api-query/contracts";
+import { directoryLimits, User } from "@effect-api-query/contracts";
 import type { QueryKey } from "@tanstack/react-query";
 import type { QueryOwner } from "@ueberbrot/effect-api-query";
 import { Schema } from "effect";
@@ -150,9 +150,11 @@ export const makeOwnerCache = ({
         return false;
       }
       for (const { adapter, data } of snapshot.directories) {
-        queryClient.setQueryData(directoryKeys[adapter], data, {
-          updatedAt: 0,
-        });
+        queryClient.setQueryData(
+          directoryKeys[adapter],
+          data.slice(0, directoryLimits.previewSize),
+          { updatedAt: 0 }
+        );
       }
       return true;
     } catch {

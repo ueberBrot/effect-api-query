@@ -1,3 +1,5 @@
+import { directoryLimits } from "@effect-api-query/contracts";
+import { PagedUserDeleteButton } from "@effect-api-query/shared/ui/paged-user-delete-button.tsx";
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
@@ -29,12 +31,12 @@ const HttpPage = () => {
   return (
     <PageLayout
       title="HTTP users"
-      description="The loader prefetched the directory and first page for the browser. HTTP and RPC share the server directory; mutations refresh both caches."
+      description="The loader prefetched a directory preview and the first infinite query page. HTTP and RPC share the server directory."
     >
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
         <HttpDirectory application={application} />
         <HttpRequestInputs application={application} />
-        <HttpPagination httpQuery={application.httpQuery} />
+        <HttpPagination application={application} />
         <HttpDiagnostics application={application} />
       </div>
     </PageLayout>
@@ -174,6 +176,7 @@ const HttpRequestInputs = ({
           HTTP name
           <input
             className="border-border-strong bg-muted border p-2"
+            maxLength={directoryLimits.nameLength}
             required
             value={name}
             onChange={(event) => {
@@ -185,6 +188,7 @@ const HttpRequestInputs = ({
           HTTP locale (optional)
           <input
             className="border-border-strong bg-muted border p-2"
+            maxLength={directoryLimits.localeLength}
             value={locale}
             onChange={(event) => {
               setLocale(event.currentTarget.value);
@@ -236,11 +240,17 @@ const HttpRequestInputs = ({
 };
 
 const HttpPagination = ({
-  httpQuery,
+  application,
 }: {
-  readonly httpQuery: TanStackStartApplication["httpQuery"];
+  readonly application: TanStackStartApplication;
 }) => {
+  const { httpQuery, invalidateUsers } = application;
+  const preview = useQuery(httpQuery.users.list.queryOptions());
+  const previewIds = new Set(preview.data?.map((user) => user.id));
   const pages = useInfiniteQuery(userPagesOptions(httpQuery));
+  const deleteUser = useMutation(
+    httpQuery.users.delete.mutationOptions({ onSuccess: invalidateUsers })
+  );
   const loaded =
     pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ??
     0;
@@ -261,9 +271,30 @@ const HttpPagination = ({
             <p>
               HTTP page {String(index + 1)}: {String(page.users.length)} users
             </p>
-            <p className="text-muted-foreground text-sm">
-              {page.users.map((user) => user.name).join(", ")}
-            </p>
+            <ul className="text-muted-foreground grid gap-1 text-sm">
+              {page.users.map((user) => (
+                <li
+                  className="flex items-center justify-between gap-3"
+                  key={user.id}
+                >
+                  <span>
+                    User {user.id}: {user.name}
+                  </span>
+                  <PagedUserDeleteButton
+                    user={user}
+                    previewIds={previewIds}
+                    transport="http"
+                    disabled={deleteUser.isPending}
+                    onDelete={({ id, revision }) => {
+                      deleteUser.mutate({
+                        params: { id },
+                        query: { revision },
+                      });
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
           </li>
         ))}
       </ol>
@@ -276,7 +307,7 @@ const HttpPagination = ({
       >
         Load next HTTP page
       </ActionButton>
-      <EffectErrorDetails error={pages.error} />
+      <EffectErrorDetails error={pages.error ?? deleteUser.error} />
     </div>
   );
 };

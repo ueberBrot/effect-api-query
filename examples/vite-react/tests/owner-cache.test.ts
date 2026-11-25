@@ -1,3 +1,4 @@
+import { directoryLimits } from "@effect-api-query/contracts";
 import { MutationObserver, onlineManager } from "@tanstack/react-query";
 import { acquireQueryOwner } from "@ueberbrot/effect-api-query";
 import { Deferred, Effect } from "effect";
@@ -143,6 +144,42 @@ describe("application private cache owner", () => {
       snapshots: storage.values.size,
       restored: resumed.restoreDirectory(),
     }).toStrictEqual({ snapshots: 0, restored: false });
+  });
+
+  it("restores only the bounded preview from an older full-directory snapshot", async () => {
+    const storage = makeStorage();
+    const owner = await makeCache(storage);
+    const key = [...ownerKeyPrefix(identity), "rpc", "users", "list", "query"];
+    const rows = Array.from(
+      { length: directoryLimits.previewSize + 1 },
+      (_, index) => ({
+        id: index + 1,
+        revision: `revision-${String(index + 1)}`,
+        name: `User ${String(index + 1)}`,
+        locale: "en",
+      })
+    );
+    storage.setItem(
+      `effect-api-query:directory:${JSON.stringify(ownerKeyPrefix(identity))}`,
+      JSON.stringify({
+        identity,
+        schemaVersion: 2,
+        keyVersion: 1,
+        directories: [{ adapter: "rpc", data: rows }],
+      })
+    );
+    try {
+      expect(owner.restoreDirectory()).toBe(true);
+      expect({
+        users: owner.queryClient.getQueryData(key),
+        updatedAt: owner.queryClient.getQueryState(key)?.dataUpdatedAt,
+      }).toStrictEqual({
+        users: rows.slice(0, directoryLimits.previewSize),
+        updatedAt: 0,
+      });
+    } finally {
+      await owner.retire();
+    }
   });
 
   it("restores only validated directory DTOs for the same owner and compatible busters", async () => {

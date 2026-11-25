@@ -1,6 +1,8 @@
+import { directoryLimits } from "@effect-api-query/contracts";
 import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
+import { PagedUserDeleteButton } from "@effect-api-query/shared/ui/paged-user-delete-button.tsx";
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
@@ -129,6 +131,93 @@ const HttpDirectory = ({
   );
 };
 
+const HttpPagination = ({
+  application,
+  preview,
+  onDeleted,
+}: {
+  readonly application: ViteReactApplication;
+  readonly preview: readonly User[] | undefined;
+  readonly onDeleted: (user: User) => void;
+}) => {
+  const { httpQuery, userWrites } = application;
+  const previewIds = new Set(preview?.map((user) => user.id));
+  const deleteUser = useMutation(userWrites.httpDelete());
+  const pages = useInfiniteQuery(
+    httpQuery.users.page.infiniteOptions({
+      initialPageParam: 0,
+      input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
+      getNextPageParam: (page) => page.nextCursor ?? undefined,
+    })
+  );
+  const loaded =
+    pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ??
+    0;
+
+  return (
+    <div className="border-border bg-background space-y-4 border p-5">
+      <h3 className="text-xl font-bold">HTTP pagination</h3>
+      <p>
+        HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)}{" "}
+        loaded
+      </p>
+      <ol className="grid gap-3">
+        {pages.data?.pages.map((page, index) => (
+          <li
+            key={pages.data.pageParams[index]}
+            className="border-border-strong border p-3"
+          >
+            <p>
+              HTTP page {String(index + 1)}: {String(page.users.length)} users
+            </p>
+            <ul className="text-muted-foreground grid gap-1 text-sm">
+              {page.users.map((user) => (
+                <li
+                  className="flex items-center justify-between gap-3"
+                  key={user.id}
+                >
+                  <span>
+                    User {user.id}: {user.name}
+                  </span>
+                  <PagedUserDeleteButton
+                    user={user}
+                    previewIds={previewIds}
+                    transport="http"
+                    disabled={deleteUser.isPending}
+                    onDelete={({ id, revision }) => {
+                      deleteUser.mutate(
+                        {
+                          params: { id },
+                          query: { revision },
+                        },
+                        {
+                          onSuccess: () => {
+                            onDeleted(user);
+                          },
+                        }
+                      );
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+      <ActionButton
+        disabled={!pages.hasNextPage || pages.isFetchingNextPage}
+        onClick={() => {
+          void pages.fetchNextPage();
+        }}
+        type="button"
+      >
+        Load next HTTP page
+      </ActionButton>
+      <EffectErrorDetails error={pages.error ?? deleteUser.error} />
+    </div>
+  );
+};
+
 export const HttpSection = ({
   application,
 }: {
@@ -156,13 +245,6 @@ export const HttpSection = ({
         selected === undefined
           ? skipToken
           : { params: { id: selected.id }, query: { locale: "fr" } },
-    })
-  );
-  const pages = useInfiniteQuery(
-    httpQuery.users.page.infiniteOptions({
-      initialPageParam: 0,
-      input: (cursor: number) => ({ query: { cursor, pageSize: 4 } }),
-      getNextPageParam: (page) => page.nextCursor ?? undefined,
     })
   );
   const [name, setName] = useState("");
@@ -196,9 +278,6 @@ export const HttpSection = ({
       }
     );
   };
-  const loaded =
-    pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ??
-    0;
 
   return (
     <section
@@ -226,6 +305,7 @@ export const HttpSection = ({
               HTTP name
               <input
                 className="border-border-strong bg-muted border p-2"
+                maxLength={directoryLimits.nameLength}
                 required
                 value={name}
                 onChange={(event) => {
@@ -237,6 +317,7 @@ export const HttpSection = ({
               HTTP locale (optional)
               <input
                 className="border-border-strong bg-muted border p-2"
+                maxLength={directoryLimits.localeLength}
                 value={locale}
                 onChange={(event) => {
                   setLocale(event.currentTarget.value);
@@ -282,39 +363,11 @@ export const HttpSection = ({
           />
           <EffectErrorDetails error={selectedUser.error} />
         </div>
-        <div className="border-border bg-background space-y-4 border p-5">
-          <h3 className="text-xl font-bold">HTTP pagination</h3>
-          <p>
-            HTTP: {String(loaded)} of {String(pages.data?.pages[0]?.total ?? 0)}{" "}
-            loaded
-          </p>
-          <ol className="grid gap-3">
-            {pages.data?.pages.map((page, index) => (
-              <li
-                key={pages.data.pageParams[index]}
-                className="border-border-strong border p-3"
-              >
-                <p>
-                  HTTP page {String(index + 1)}: {String(page.users.length)}{" "}
-                  users
-                </p>
-                <p className="text-muted-foreground text-sm">
-                  {page.users.map((user) => user.name).join(", ")}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <ActionButton
-            disabled={!pages.hasNextPage || pages.isFetchingNextPage}
-            onClick={() => {
-              void pages.fetchNextPage();
-            }}
-            type="button"
-          >
-            Load next HTTP page
-          </ActionButton>
-          <EffectErrorDetails error={pages.error} />
-        </div>
+        <HttpPagination
+          application={application}
+          preview={users.data}
+          onDeleted={clearDeletedSelection}
+        />
         <div className="border-border bg-background space-y-4 border p-5">
           <h3 className="text-xl font-bold">HTTP failures and cancellation</h3>
           <p className="text-muted-foreground text-sm">

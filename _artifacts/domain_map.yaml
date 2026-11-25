@@ -256,6 +256,13 @@ skills:
         source: examples/server/src/users.ts
         priority: CRITICAL
         status: active
+      - mistake: Prefetch a complete shared directory for hydration
+        mechanism: Successful directory queries can grow with every write and are serialized into the response.
+        wrong_pattern: Fetch every row in the loader and rely on the successful-query filter to bound the snapshot.
+        correct_pattern: Fetch a bounded first page and request later pages in the browser. Bound retained rows atomically in the shared store and cap fields in the contracts.
+        source: examples/server/src/users.ts
+        priority: HIGH
+        status: active
       - mistake: Hydrate rich values without paired view codecs
         mechanism: JSON loses prototypes, rich page parameters, and distinct undefined elements.
         wrong_pattern: hydrate(queryClient, JSON.parse(snapshot))

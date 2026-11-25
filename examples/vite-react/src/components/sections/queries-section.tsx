@@ -1,8 +1,10 @@
 import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
+import { PagedUserDeleteButton } from "@effect-api-query/shared/ui/paged-user-delete-button.tsx";
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -103,10 +105,15 @@ const FeaturedUserPanel = ({
 };
 
 const InfiniteUserQueries = ({
-  rpcQuery,
+  application,
+  preview,
 }: {
-  readonly rpcQuery: ViteReactApplication["rpcQuery"];
+  readonly application: ViteReactApplication;
+  readonly preview: readonly User[] | undefined;
 }) => {
+  const { rpcQuery, userWrites } = application;
+  const deleteUser = useMutation(userWrites.rpcDelete());
+  const previewIds = new Set(preview?.map((user) => user.id));
   const userPages = useInfiniteQuery(
     rpcQuery.users.page.infiniteOptions({
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -161,6 +168,15 @@ const InfiniteUserQueries = ({
                   key={user.id}
                 >
                   <strong>{`#${String(pageIndex * PAGE_SIZE + userIndex + 1)} ${user.name}`}</strong>
+                  <PagedUserDeleteButton
+                    user={user}
+                    previewIds={previewIds}
+                    transport="rpc"
+                    disabled={deleteUser.isPending}
+                    onDelete={({ id, revision }) => {
+                      deleteUser.mutate({ id, revision });
+                    }}
+                  />
                 </li>
               ))}
             </ul>
@@ -181,6 +197,7 @@ const InfiniteUserQueries = ({
           {String(pageCount)} {pageCount === 1 ? "page" : "pages"} in the cache
         </span>
       </div>
+      <EffectErrorDetails error={deleteUser.error} />
     </div>
   );
 };
@@ -233,7 +250,7 @@ export const QueriesSection = ({
           One directory, two strategies
         </h2>
         <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
-          The ordinary query downloads the full directory. The infinite query
+          The ordinary query downloads a directory preview. The infinite query
           starts with four people and appends one clearly labeled page per
           click.
         </p>
@@ -250,7 +267,7 @@ export const QueriesSection = ({
             </span>
           </div>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
-            Every user arrives together and shares one cache entry.
+            The first directory page shares one cache entry.
           </p>
           {users.isPending ? (
             <p className="text-muted-foreground mt-4 text-sm">Loading users…</p>
@@ -301,7 +318,7 @@ export const QueriesSection = ({
 
         <ConditionalUserQuery rpcQuery={rpcQuery} users={users.data ?? []} />
 
-        <InfiniteUserQueries rpcQuery={rpcQuery} />
+        <InfiniteUserQueries application={application} preview={users.data} />
       </div>
 
       <div className="border-border border-l-brand-600 bg-brand-950/10 border border-l-2 p-5">

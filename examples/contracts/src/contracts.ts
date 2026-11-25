@@ -2,29 +2,60 @@
 import { Effect, Schema } from "effect";
 import { Rpc, RpcGroup, RpcMiddleware } from "effect/rpc";
 
+export const directoryLimits = {
+  nameLength: 128,
+  localeLength: 32,
+  revisionLength: 64,
+  users: 128,
+  previewSize: 16,
+  maxPageSize: 100,
+} as const;
+
+export const UserLocale = Schema.String.check(
+  Schema.isMaxLength(directoryLimits.localeLength)
+);
+const UserName = Schema.String.check(
+  Schema.isMaxLength(directoryLimits.nameLength)
+);
+
 export const UserIdentity = {
   id: Schema.Int,
-  revision: Schema.NonEmptyString,
+  revision: Schema.NonEmptyString.check(
+    Schema.isMaxLength(directoryLimits.revisionLength)
+  ),
 } as const;
 
 export class User extends Schema.Class<User, { readonly brand: unique symbol }>(
   "User"
 )({
   ...UserIdentity,
-  locale: Schema.String,
-  name: Schema.String,
+  locale: UserLocale,
+  name: UserName,
 }) {}
 
 export class SeedUser extends Schema.Class<
   SeedUser,
   { readonly brand: unique symbol }
 >("SeedUser")({
-  locale: Schema.String.pipe(
+  locale: UserLocale.pipe(
     Schema.optionalKey,
     Schema.withConstructorDefault(Effect.succeed("en"))
   ),
-  name: Schema.String,
+  name: UserName,
 }) {}
+
+export const UserWriteInput = Schema.Struct(SeedUser.fields);
+
+export const DirectoryFirstPage = Schema.Array(User).check(
+  Schema.isMaxLength(directoryLimits.previewSize)
+);
+
+export const UserPageInput = {
+  cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  pageSize: Schema.Int.check(
+    Schema.isBetween({ minimum: 1, maximum: directoryLimits.maxPageSize })
+  ),
+};
 
 export class UserPage extends Schema.Class<
   UserPage,
@@ -32,8 +63,18 @@ export class UserPage extends Schema.Class<
 >("UserPage")({
   nextCursor: Schema.NullOr(Schema.Int),
   total: Schema.Int,
-  users: Schema.Array(User),
+  users: Schema.Array(User).check(
+    Schema.isMaxLength(directoryLimits.maxPageSize)
+  ),
 }) {}
+
+export const DirectoryCapacityExceeded = Schema.Literal(
+  "directory-capacity-exceeded"
+);
+export const DirectoryWriteQuotaExceeded = Schema.Literal(
+  "directory-write-quota-exceeded"
+);
+export const InvalidUserInput = Schema.Literal("invalid-user-input");
 
 // oxlint-disable-next-line unicorn/throw-new-error
 export class DiagnosticFailure extends Schema.TaggedError<
@@ -132,30 +173,32 @@ export type CommandPayload = Rpc.Payload<typeof CommandsStart>;
 const UsersGet = Rpc.make("users.get", {
   payload: {
     id: Schema.Int,
-    locale: Schema.String.pipe(
+    locale: UserLocale.pipe(
       Schema.optionalKey,
       Schema.withConstructorDefault(Effect.succeed("en"))
     ),
   },
   success: User,
-  error: Schema.Literal("user-not-found"),
+  error: Schema.Union([Schema.Literal("user-not-found"), InvalidUserInput]),
 });
 
 const UsersList = Rpc.make("users.list", {
-  success: Schema.Array(User),
+  success: DirectoryFirstPage,
 });
 
 const UsersPage = Rpc.make("users.page", {
-  payload: {
-    cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
-    pageSize: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 100 })),
-  },
+  payload: UserPageInput,
   success: UserPage,
 });
 
 const UsersCreate = Rpc.make("users.create", {
   payload: SeedUser,
   success: User,
+  error: Schema.Union([
+    InvalidUserInput,
+    DirectoryCapacityExceeded,
+    DirectoryWriteQuotaExceeded,
+  ]),
 });
 
 const UsersDelete = Rpc.make("users.delete", {
