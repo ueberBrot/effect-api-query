@@ -1,0 +1,10 @@
+packages: []
+
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+trustLockfile: false
+
+allowBuilds:
+  "@google/genai@2.21.0": false
+  "protobufjs@7.6.6": false

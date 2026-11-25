@@ -116,6 +116,7 @@ export default defineConfig({
     ignorePatterns: [
       ...(ultraciteCore.ignorePatterns ?? []),
       ...ignoredPaths,
+      ".deepsec/**",
       "tests/types/**",
       "tests/framework-consumers/**",
       "apps/docs/**/*.astro",
@@ -492,6 +493,33 @@ export default defineConfig({
       },
       "repository-check": {
         command: "node --import tsx scripts/check-workflow.mts",
+        cache: false,
+      },
+      "deepsec:scan": {
+        command: "pnpm exec deepsec scan && pnpm exec deepsec process",
+        cwd: ".deepsec",
+        cache: false,
+      },
+      "deepsec:status": {
+        command: "pnpm exec deepsec status",
+        cwd: ".deepsec",
+        cache: false,
+      },
+      "deepsec:revalidate": {
+        command: "pnpm exec deepsec revalidate",
+        cwd: ".deepsec",
+        cache: false,
+      },
+      "deepsec:export": {
+        command:
+          "pnpm exec deepsec export --format md-dir --out data/effect-api-query/reports/findings",
+        cwd: ".deepsec",
+        cache: false,
+      },
+      "deepsec:export-confirmed": {
+        command:
+          "pnpm exec deepsec export --only-true-positive --format md-dir --out data/effect-api-query/reports/confirmed-findings",
+        cwd: ".deepsec",
         cache: false,
       },
       "toolchain-check": {
