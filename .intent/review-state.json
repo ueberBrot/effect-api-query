@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "fb0764a694517eed6224314638753bcc4bd3fa82a1798dc7598a70637c4eec1b",
+      "fingerprint": "394bce2dae92316dd319f5634937beccc91a70a370724c47839e9433125f6e0a",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -281,7 +281,7 @@
         "src/http/types.ts": "15df4dce68fe31a2f1f10afba822a48b27c297f9fa3f9aaf9ce8ad2589074f0f",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
         "src/react/index.tsx": "e273f4d61fe05c9143d209b7f10ab001a3418155be33b22855744ea2a7ec9525",
-        "src/rpc/create-utils.ts": "00594c143c5aa6e199550259caa320e01c06890a1fb0f36d8d858c6368584b0d",
+        "src/rpc/create-utils.ts": "f4ad2a6b3987840809df6d635a305d81bf87f8ebc7d387dd1fe7690d9d919a6a",
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
         "src/rpc/operation.ts": "0dc2167670a4d99500be536d660cc49488d651a1376f75522aea5d4ad7f778dd",
         "src/rpc/streamed-query.ts": "fd943d0d6de22f3458cb1373dbae346890d15865597357bacb13a9085ab3652b",
@@ -435,17 +435,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "efcac0502bddbc3a939264e97afb22a655c373e1",
-      "outcome": "updated",
-      "reason": "The shared example HTTP RPC host rejects over-limit operation counts before dispatch and caps encoded aggregate replies. The frameworks-and-hosts reference explains the application-owned limits and the risk of retrying completed writes.",
+      "head": "95ceec3de436a4d99e0cf0577b376da518ea2d97",
+      "outcome": "no-change",
+      "reason": "The narrow lint exception preserves the RPC overload, runtime behavior, and existing guidance.",
       "evidence": [
-        "Reviewed examples/server/src/buffered-rpc.ts and web-handler.ts at efcac05 against 57c53bf.",
-        "All 65 example server tests passed, including exact UTF-8 limits, cleanup after overflow, streams, caller ownership, operation caps and Expect: 100-continue.",
-        "vp run skills-check passed. Fresh consumer discovery was not evaluated."
+        "Changed: src/rpc/create-utils.ts at 95ceec3de436a4d99e0cf0577b376da518ea2d97"
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "2a4149fdeab1f0486b84c2bae34cf247f71dc1023ddc85e67ce48bef5268d39c",
+      "fingerprint": "0b57433fdbc77b6359cdc339a3b6ad77c340c06e8741115eb7131b48a61368ff",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -726,7 +724,7 @@
         "src/http/types.ts": "15df4dce68fe31a2f1f10afba822a48b27c297f9fa3f9aaf9ce8ad2589074f0f",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
         "src/react/index.tsx": "e273f4d61fe05c9143d209b7f10ab001a3418155be33b22855744ea2a7ec9525",
-        "src/rpc/create-utils.ts": "00594c143c5aa6e199550259caa320e01c06890a1fb0f36d8d858c6368584b0d",
+        "src/rpc/create-utils.ts": "f4ad2a6b3987840809df6d635a305d81bf87f8ebc7d387dd1fe7690d9d919a6a",
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
         "src/rpc/operation.ts": "0dc2167670a4d99500be536d660cc49488d651a1376f75522aea5d4ad7f778dd",
         "src/rpc/streamed-query.ts": "fd943d0d6de22f3458cb1373dbae346890d15865597357bacb13a9085ab3652b",
@@ -880,12 +878,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "efcac0502bddbc3a939264e97afb22a655c373e1",
-      "outcome": "updated",
-      "reason": "The domain map and planning record capture count admission, framed response accounting and per-request cleanup. The existing skill tree already maps the example server implementation and tests.",
+      "head": "95ceec3de436a4d99e0cf0577b376da518ea2d97",
+      "outcome": "no-change",
+      "reason": "The narrow lint exception preserves the RPC overload, runtime behavior, and existing guidance.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md and _artifacts/skill_tree.yaml reviewed against the frameworks-and-hosts reference and scoped runtime tests at efcac05.",
-        "vp exec intent maintainer sync found no changes."
+        "Changed: src/rpc/create-utils.ts at 95ceec3de436a4d99e0cf0577b376da518ea2d97"
       ]
     },
     "source:vite.config.ts": {
