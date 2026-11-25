@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "f37daa87ef25ca81df80df518c27befa029eb31987e04aa820024a055938fef4",
+      "fingerprint": "d57d0b027d565e47e4bddd69fde85d083fc27c671532f3948fd4ee1a2318cf8b",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -113,8 +113,8 @@
         "docs/adr/0054-match-stream-policies-in-leaf-query-filters.md": "a0488155d342a211d0314435032b2d50cf3f36267f7aa90da584920be98888bf",
         "docs/adr/0059-version-and-isolate-generated-query-keys.md": "4e9045e2b28edb661bdf41f01c566e94b1fac1d956e7a72dab35b029b68311d9",
         "e2e/directory-pages.spec.ts": "5141f90d64cac10b6edce753335937e7f2f5a77a6c23ec86ed198fb2417e323a",
-        "e2e/example-application.ts": "8521641865c0ba8936b8bd43797a66b43faeeab2fe0abd2e7595448f847f2f90",
-        "e2e/example-host.ts": "1e4e32722d80803843919401fa28cccfdb2df20855cda94604875475b9b1a463",
+        "e2e/example-application.ts": "a7a1ec35200937ce01aea346073d96df57555300dccef949f836400783addb46",
+        "e2e/example-host.ts": "3dcb29865e07b9704d06924e00078a3b87bd1b24ec57221ae5988159b5db95c7",
         "e2e/http-workflows.spec.ts": "b3da3b87ea8aef6ebf47bbf3c6462a9dfa25df3ef7f9cc22e40c9a46c1bfa262",
         "e2e/tanstack-start-http.spec.ts": "a6485eb3647678d42692a77241821f50c5aa69b43c6e57dec6e8002df6285dbd",
         "e2e/vite-http.spec.ts": "991428a3b25b9214c65e4ab80ceec0e2d07d08f4d8062282b5792acaf08bc370",
@@ -440,18 +440,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8127e5517f3afe51059129794a586d471f1e4dac",
-      "outcome": "updated",
-      "reason": "A successful shared directory read used to transfer all users. The hydration reference now directs loaders to bounded first pages and locates field, capacity, and write quota enforcement at the application seams.",
+      "head": "e6ae26bbaf62f635f0a02847cca900c5b191f832",
+      "outcome": "no-change",
+      "reason": "Only the Playwright child and Vite preview config loaders changed. Both example hosts still exercise the same transport, authentication, cancellation, and application-owned lifecycle documented in frameworks-and-hosts.",
       "evidence": [
-        "examples/contracts/src/contracts.ts and examples/server/src/users.ts at 8127e55",
-        "Directory, operation, and buffered RPC limit suites passed",
-        "Six directory browser cases passed on Chromium, Firefox, and WebKit",
-        "Fresh installed consumer discovery was not evaluated"
+        "Diff from e6ae26bbaf62f635f0a02847cca900c5b191f832 in e2e/example-application.ts and e2e/example-host.ts. Both Vite application builds passed. On pinned Node 24.22.1, WebKit passed the existing first typed write scenario for both standalone and TanStack Start. Reviewed the host reference, domain map, skill specification, and skill tree."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "c62e5d83180fbba809d13d71ae904be047ced01f1f27353213743ba7a405635e",
+      "fingerprint": "1959010d4f2d8c3ae90545dc29e25c6ee58f005cb5ed05e9228d57283d071cd2",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -564,8 +561,8 @@
         "docs/adr/0054-match-stream-policies-in-leaf-query-filters.md": "a0488155d342a211d0314435032b2d50cf3f36267f7aa90da584920be98888bf",
         "docs/adr/0059-version-and-isolate-generated-query-keys.md": "4e9045e2b28edb661bdf41f01c566e94b1fac1d956e7a72dab35b029b68311d9",
         "e2e/directory-pages.spec.ts": "5141f90d64cac10b6edce753335937e7f2f5a77a6c23ec86ed198fb2417e323a",
-        "e2e/example-application.ts": "8521641865c0ba8936b8bd43797a66b43faeeab2fe0abd2e7595448f847f2f90",
-        "e2e/example-host.ts": "1e4e32722d80803843919401fa28cccfdb2df20855cda94604875475b9b1a463",
+        "e2e/example-application.ts": "a7a1ec35200937ce01aea346073d96df57555300dccef949f836400783addb46",
+        "e2e/example-host.ts": "3dcb29865e07b9704d06924e00078a3b87bd1b24ec57221ae5988159b5db95c7",
         "e2e/http-workflows.spec.ts": "b3da3b87ea8aef6ebf47bbf3c6462a9dfa25df3ef7f9cc22e40c9a46c1bfa262",
         "e2e/tanstack-start-http.spec.ts": "a6485eb3647678d42692a77241821f50c5aa69b43c6e57dec6e8002df6285dbd",
         "e2e/vite-http.spec.ts": "991428a3b25b9214c65e4ab80ceec0e2d07d08f4d8062282b5792acaf08bc370",
@@ -891,13 +888,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8127e5517f3afe51059129794a586d471f1e4dac",
-      "outcome": "updated",
-      "reason": "The domain map records the unbounded hydration failure mode, the specification records the preview and quota decisions, and the tree maps both loaders, paginated delete UI, the write form, and the browser regression.",
+      "head": "e6ae26bbaf62f635f0a02847cca900c5b191f832",
+      "outcome": "no-change",
+      "reason": "The domain map and skill specification describe consumer tasks and host behavior that the test loader does not change. The skill tree already maps both fixture files and the existing acceptance assertions exercise them.",
       "evidence": [
-        "_artifacts/domain_map.yaml, _artifacts/skill_spec.md, and _artifacts/skill_tree.yaml at 8127e55",
-        "vp run skills-check passed",
-        "Browser cases verified bounded HTML and hydration, later pages, and server-confirmed revision-checked deletion"
+        "Diff from e6ae26bbaf62f635f0a02847cca900c5b191f832 in e2e/example-application.ts and e2e/example-host.ts. Both Vite application builds passed. On pinned Node 24.22.1, WebKit passed the existing first typed write scenario for both standalone and TanStack Start. Reviewed the host reference, domain map, skill specification, and skill tree."
       ]
     },
     "source:vite.config.ts": {
