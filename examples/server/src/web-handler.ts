@@ -11,8 +11,8 @@ import {
   HttpRouter,
   HttpServer,
 } from "effect/http";
-import { RpcSerialization, RpcServer } from "effect/rpc";
 
+import { makeBufferedRpcHttpEffect } from "./buffered-rpc.ts";
 import type { Caller } from "./caller.ts";
 import {
   anonymousCaller,
@@ -28,10 +28,6 @@ import { exampleRpcHandlersLayer } from "./rpc-handlers.ts";
 import { makeServerLocalRpcClient } from "./server-local-rpc.ts";
 import { workflowRoutes } from "./workflow-handlers.ts";
 
-const rpcLayer = Layer.mergeAll(
-  exampleRpcHandlersLayer,
-  RpcSerialization.layerJson
-);
 export const maxRequestBodyBytes = 1024 * 1024;
 
 const readRequestBody = async (
@@ -119,8 +115,11 @@ const withRequestBodyLimit =
 const makeRpcWebHandler = Effect.fn("ExampleRpc.makeRpcWebHandler")(
   function* () {
     const scope = yield* Scope.Scope;
-    const rpcContext = yield* Layer.buildWithScope(rpcLayer, scope);
-    const rpcHttpEffect = yield* RpcServer.toHttpEffect(exampleRpcGroup).pipe(
+    const rpcContext = yield* Layer.buildWithScope(
+      exampleRpcHandlersLayer,
+      scope
+    );
+    const rpcHttpEffect = yield* makeBufferedRpcHttpEffect.pipe(
       Effect.provide(rpcContext),
       Scope.provide(scope)
     );

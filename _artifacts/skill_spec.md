@@ -206,3 +206,7 @@ The hydration review confirms that successful native query state can retain an e
 ### Directory deletion and restoration (#249)
 
 Base `f49dc0e`. The cache-workflows reference covers read-only restored views and application-owned record revisions. The domain map records numeric ID reuse. The skill tree maps the directory UI and its transport call sites. The example persists revision-bearing DTOs under schema version 2. Server tests exercise the same conditional deletion through RPC and HTTP. Vite integration and browser tests cover late selection settlement, featured-user fallback, and per-adapter refresh. Fresh consumer-agent discovery is unverified.
+
+### Buffered RPC resource limits (#250)
+
+Base `57c53bf`. The frameworks-and-hosts reference covers example HTTP RPC admission and response budgets. The host rejects requests above 16 messages before dispatch, and caps the encoded JSON array at 1 MiB while Effect produces replies. Internal frames use a one-element protocol queue. Each frame reserves a separator byte. The collector adds the opening bracket and replaces the final comma with the closing bracket. Overflow emits a terminal NUL byte, which JSON encoding escapes within data. The client receives standard buffered JSON. The request scope closes on overflow or abort. Completed operations can have side effects before a response overflows. The domain map records the transport mistake. The existing skill tree covers the implementation and fixtures through its example-server globs. Directory and SSR quotas follow separately.

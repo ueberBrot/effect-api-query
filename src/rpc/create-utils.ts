@@ -25,6 +25,7 @@ import type {
  */
 export function createRpcQueryUtils<
   const Group extends RpcGroup.Any,
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type -- Generic RPC groups can have no tags.
   Client extends ReadyRpcClient<RpcsOf<Group>, unknown>,
 >(
   group: Group,
