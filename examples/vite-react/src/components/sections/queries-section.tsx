@@ -3,6 +3,7 @@ import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import {
   useInfiniteQuery,
+  useMutation,
   useQuery,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -103,10 +104,15 @@ const FeaturedUserPanel = ({
 };
 
 const InfiniteUserQueries = ({
-  rpcQuery,
+  application,
+  preview,
 }: {
-  readonly rpcQuery: ViteReactApplication["rpcQuery"];
+  readonly application: ViteReactApplication;
+  readonly preview: readonly User[] | undefined;
 }) => {
+  const { rpcQuery, userWrites } = application;
+  const deleteUser = useMutation(userWrites.rpcDelete());
+  const previewIds = new Set(preview?.map((user) => user.id));
   const userPages = useInfiniteQuery(
     rpcQuery.users.page.infiniteOptions({
       getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
@@ -161,6 +167,22 @@ const InfiniteUserQueries = ({
                   key={user.id}
                 >
                   <strong>{`#${String(pageIndex * PAGE_SIZE + userIndex + 1)} ${user.name}`}</strong>
+                  {!previewIds.has(user.id) && user.id > 0 && (
+                    <ActionButton
+                      aria-label={`Delete ${user.name}`}
+                      disabled={deleteUser.isPending}
+                      onClick={() => {
+                        deleteUser.mutate({
+                          id: user.id,
+                          revision: user.revision,
+                        });
+                      }}
+                      type="button"
+                      variant="danger"
+                    >
+                      Delete
+                    </ActionButton>
+                  )}
                 </li>
               ))}
             </ul>
@@ -181,6 +203,7 @@ const InfiniteUserQueries = ({
           {String(pageCount)} {pageCount === 1 ? "page" : "pages"} in the cache
         </span>
       </div>
+      <EffectErrorDetails error={deleteUser.error} />
     </div>
   );
 };
@@ -301,7 +324,7 @@ export const QueriesSection = ({
 
         <ConditionalUserQuery rpcQuery={rpcQuery} users={users.data ?? []} />
 
-        <InfiniteUserQueries rpcQuery={rpcQuery} />
+        <InfiniteUserQueries application={application} preview={users.data} />
       </div>
 
       <div className="border-border border-l-brand-600 bg-brand-950/10 border border-l-2 p-5">

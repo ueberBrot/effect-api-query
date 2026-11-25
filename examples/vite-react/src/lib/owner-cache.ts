@@ -152,7 +152,7 @@ export const makeOwnerCache = ({
       for (const { adapter, data } of snapshot.directories) {
         queryClient.setQueryData(
           directoryKeys[adapter],
-          data.slice(0, directoryLimits.firstPageSize),
+          data.slice(0, directoryLimits.previewSize),
           { updatedAt: 0 }
         );
       }

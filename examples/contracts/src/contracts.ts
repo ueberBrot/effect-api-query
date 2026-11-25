@@ -5,9 +5,10 @@ import { Rpc, RpcGroup, RpcMiddleware } from "effect/rpc";
 export const directoryLimits = {
   nameLength: 128,
   localeLength: 32,
+  revisionLength: 64,
   users: 128,
-  firstPageSize: 16,
-  pageSize: 100,
+  previewSize: 16,
+  maxPageSize: 100,
 } as const;
 
 export const UserLocale = Schema.String.check(
@@ -19,7 +20,9 @@ const UserName = Schema.String.check(
 
 export const UserIdentity = {
   id: Schema.Int,
-  revision: Schema.NonEmptyString.check(Schema.isMaxLength(64)),
+  revision: Schema.NonEmptyString.check(
+    Schema.isMaxLength(directoryLimits.revisionLength)
+  ),
 } as const;
 
 export class User extends Schema.Class<User, { readonly brand: unique symbol }>(
@@ -41,14 +44,16 @@ export class SeedUser extends Schema.Class<
   name: UserName,
 }) {}
 
+export const UserWriteInput = Schema.Struct(SeedUser.fields);
+
 export const DirectoryFirstPage = Schema.Array(User).check(
-  Schema.isMaxLength(directoryLimits.firstPageSize)
+  Schema.isMaxLength(directoryLimits.previewSize)
 );
 
 export const UserPageInput = {
   cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
   pageSize: Schema.Int.check(
-    Schema.isBetween({ minimum: 1, maximum: directoryLimits.pageSize })
+    Schema.isBetween({ minimum: 1, maximum: directoryLimits.maxPageSize })
   ),
 };
 
@@ -58,11 +63,16 @@ export class UserPage extends Schema.Class<
 >("UserPage")({
   nextCursor: Schema.NullOr(Schema.Int),
   total: Schema.Int,
-  users: Schema.Array(User).check(Schema.isMaxLength(directoryLimits.pageSize)),
+  users: Schema.Array(User).check(
+    Schema.isMaxLength(directoryLimits.maxPageSize)
+  ),
 }) {}
 
 export const DirectoryCapacityExceeded = Schema.Literal(
   "directory-capacity-exceeded"
+);
+export const DirectoryWriteQuotaExceeded = Schema.Literal(
+  "directory-write-quota-exceeded"
 );
 export const InvalidUserInput = Schema.Literal("invalid-user-input");
 
@@ -184,7 +194,11 @@ const UsersPage = Rpc.make("users.page", {
 const UsersCreate = Rpc.make("users.create", {
   payload: SeedUser,
   success: User,
-  error: Schema.Union([InvalidUserInput, DirectoryCapacityExceeded]),
+  error: Schema.Union([
+    InvalidUserInput,
+    DirectoryCapacityExceeded,
+    DirectoryWriteQuotaExceeded,
+  ]),
 });
 
 const UsersDelete = Rpc.make("users.delete", {

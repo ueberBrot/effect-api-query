@@ -5,24 +5,26 @@ import { describe, expect, it } from "@effect/vitest";
 import { Effect, Exit } from "effect";
 import { FetchHttpClient } from "effect/http";
 import { HttpApiClient } from "effect/http-api";
+import { TestClock } from "effect/testing";
 
-import { makeUsers } from "../src/users.ts";
+import { directoryWriteQuota, makeUsers } from "../src/users.ts";
 import { startExampleServerFixture } from "./fixtures/example-server.ts";
 
 const longestUser = {
   name: "n".repeat(directoryLimits.nameLength),
   locale: "l".repeat(directoryLimits.localeLength),
 };
+const invalidUsers = [
+  { ...longestUser, name: `${longestUser.name}n` },
+  { ...longestUser, locale: `${longestUser.locale}l` },
+];
 
 describe("example directory limits", () => {
   it.effect("validates writes before changing the shared store", () =>
     Effect.gen(function* boundDirectoryInput() {
       const users = yield* makeUsers();
       const before = yield* users.list();
-      for (const invalid of [
-        { ...longestUser, name: `${longestUser.name}n` },
-        { ...longestUser, locale: `${longestUser.locale}l` },
-      ]) {
+      for (const invalid of invalidUsers) {
         expect(yield* Effect.flip(users.create(invalid))).toBe(
           "invalid-user-input"
         );
@@ -46,6 +48,29 @@ describe("example directory limits", () => {
         id: before.length + 1,
       });
     })
+  );
+
+  it.effect(
+    "keeps the create quota until the window expires after deletions",
+    () =>
+      Effect.gen(function* expireDirectoryWriteQuota() {
+        const users = yield* makeUsers();
+        const initial = yield* users.list();
+        for (let index = 0; index < directoryWriteQuota.creates; index += 1) {
+          const { id, revision } = yield* users.create(longestUser);
+          yield* users.delete({ id, revision });
+        }
+        yield* TestClock.adjust(directoryWriteQuota.windowMs - 1);
+        expect(yield* Effect.flip(users.create(longestUser))).toBe(
+          "directory-write-quota-exceeded"
+        );
+        expect(yield* users.list()).toStrictEqual(initial);
+        yield* TestClock.adjust(1);
+        expect(yield* users.create(longestUser)).toMatchObject({
+          ...longestUser,
+          id: initial.length + directoryWriteQuota.creates + 1,
+        });
+      })
   );
 
   it.effect("shares the last write slot across RPC and HTTP", () =>
@@ -87,7 +112,7 @@ describe("example directory limits", () => {
         http: "directory-capacity-exceeded",
       });
 
-      const expectedPreview = seeded.slice(0, directoryLimits.firstPageSize);
+      const expectedPreview = seeded.slice(0, directoryLimits.previewSize);
       expect({
         rpc: yield* rpc["users.list"](),
         http: yield* http.users.list(),
@@ -115,14 +140,14 @@ describe("example directory limits", () => {
       expect({
         replacement: yield* rpc["users.create"]({ name: "Replacement" }),
         firstPage: yield* http.users.page({
-          query: { cursor: 0, pageSize: directoryLimits.firstPageSize },
+          query: { cursor: 0, pageSize: directoryLimits.previewSize },
         }),
       }).toMatchObject({
         replacement: { id: directoryLimits.users + 1, locale: "en" },
         firstPage: {
           total: directoryLimits.users,
-          nextCursor: directoryLimits.firstPageSize,
-          users: seeded.slice(1, directoryLimits.firstPageSize + 1),
+          nextCursor: directoryLimits.previewSize,
+          users: seeded.slice(1, directoryLimits.previewSize + 1),
         },
       });
     })
@@ -136,10 +161,7 @@ describe("example directory limits", () => {
         baseUrl: server.url,
       }).pipe(Effect.provide(FetchHttpClient.layer));
 
-      for (const invalid of [
-        { ...longestUser, name: `${longestUser.name}n` },
-        { ...longestUser, locale: `${longestUser.locale}l` },
-      ]) {
+      for (const invalid of invalidUsers) {
         expect(
           Exit.hasDies(yield* Effect.exit(rpc["users.create"](invalid)))
         ).toBe(true);

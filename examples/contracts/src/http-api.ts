@@ -14,18 +14,19 @@ import {
   DiagnosticStatus,
   DirectoryCapacityExceeded,
   DirectoryFirstPage,
+  DirectoryWriteQuotaExceeded,
   ExampleAuthorizationError,
   InvalidOperationInput,
   InvalidUserInput,
   OperationCapacityExceeded,
   OperationId,
   OperationNotFound,
-  SeedUser,
   User,
   UserIdentity,
   UserLocale,
   UserPage,
   UserPageInput,
+  UserWriteInput,
 } from "./contracts.ts";
 
 const unauthorized = ExampleAuthorizationError.pipe(HttpApiSchema.status(401));
@@ -49,11 +50,12 @@ const users = HttpApiGroup.make("users").add(
     error: [missingUser, invalidUser],
   }),
   HttpApiEndpoint.post("create", "/users", {
-    payload: Schema.Struct(SeedUser.fields),
+    payload: UserWriteInput,
     success: User,
     error: [
       invalidUser,
       DirectoryCapacityExceeded.pipe(HttpApiSchema.status(409)),
+      DirectoryWriteQuotaExceeded.pipe(HttpApiSchema.status(429)),
     ],
   }),
   HttpApiEndpoint.delete("delete", "/users/:id", {

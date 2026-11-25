@@ -35,7 +35,7 @@ const HttpPage = () => {
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
         <HttpDirectory application={application} />
         <HttpRequestInputs application={application} />
-        <HttpPagination httpQuery={application.httpQuery} />
+        <HttpPagination application={application} />
         <HttpDiagnostics application={application} />
       </div>
     </PageLayout>
@@ -239,11 +239,17 @@ const HttpRequestInputs = ({
 };
 
 const HttpPagination = ({
-  httpQuery,
+  application,
 }: {
-  readonly httpQuery: TanStackStartApplication["httpQuery"];
+  readonly application: TanStackStartApplication;
 }) => {
+  const { httpQuery, invalidateUsers } = application;
+  const preview = useQuery(httpQuery.users.list.queryOptions());
+  const previewIds = new Set(preview.data?.map((user) => user.id));
   const pages = useInfiniteQuery(userPagesOptions(httpQuery));
+  const deleteUser = useMutation(
+    httpQuery.users.delete.mutationOptions({ onSuccess: invalidateUsers })
+  );
   const loaded =
     pages.data?.pages.reduce((count, page) => count + page.users.length, 0) ??
     0;
@@ -267,6 +273,25 @@ const HttpPagination = ({
             <p className="text-muted-foreground text-sm">
               {page.users.map((user) => user.name).join(", ")}
             </p>
+            {page.users
+              .filter((user) => !previewIds.has(user.id))
+              .map((user) => (
+                <ActionButton
+                  aria-label={`Delete HTTP ${user.name}`}
+                  disabled={deleteUser.isPending}
+                  key={user.id}
+                  onClick={() => {
+                    deleteUser.mutate({
+                      params: { id: user.id },
+                      query: { revision: user.revision },
+                    });
+                  }}
+                  type="button"
+                  variant="danger"
+                >
+                  Delete
+                </ActionButton>
+              ))}
           </li>
         ))}
       </ol>
@@ -279,7 +304,7 @@ const HttpPagination = ({
       >
         Load next HTTP page
       </ActionButton>
-      <EffectErrorDetails error={pages.error} />
+      <EffectErrorDetails error={pages.error ?? deleteUser.error} />
     </div>
   );
 };

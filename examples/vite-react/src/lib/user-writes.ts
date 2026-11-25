@@ -194,7 +194,7 @@ export const makeUserWrites = ({
       (users) =>
         users === undefined
           ? undefined
-          : edit(users).slice(0, directoryLimits.firstPageSize),
+          : edit(users).slice(0, directoryLimits.previewSize),
       { updatedAt: query.state.dataUpdatedAt }
     );
     listWrites.set(query, { dataUpdateCount, writes });
@@ -242,7 +242,7 @@ export const makeUserWrites = ({
       writes.add(write);
     }
     const patched = new UserPage({
-      users: users.slice(0, directoryLimits.pageSize),
+      users: users.slice(0, directoryLimits.maxPageSize),
       total: page.total + (applied ? totalChange : 0),
       nextCursor: page.nextCursor,
     });

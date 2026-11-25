@@ -1,13 +1,18 @@
 import { randomUUID } from "node:crypto";
 
 import {
+  DirectoryCapacityExceeded,
   directoryLimits,
-  SeedUser,
+  DirectoryWriteQuotaExceeded,
+  InvalidUserInput,
   User,
   UserLocale,
   UserPage,
+  UserWriteInput,
 } from "@effect-api-query/contracts";
-import { Effect, Ref, Schema } from "effect";
+import { Clock, Effect, Ref, Result, Schema } from "effect";
+
+export const directoryWriteQuota = { creates: 128, windowMs: 60_000 } as const;
 
 const initialUsers = [
   { locale: "en", name: "Ada Lovelace" },
@@ -22,21 +27,28 @@ const initialUsers = [
   { locale: "en", name: "Dennis Ritchie" },
   { locale: "en", name: "Annie Easley" },
   { locale: "en", name: "James Gosling" },
-] as const satisfies readonly Pick<SeedUser, "name" | "locale">[];
+] as const satisfies readonly UserInput[];
 
 interface ServerState {
+  readonly createWindow: {
+    readonly accepted: number;
+    readonly expiresAt: number;
+  };
   readonly nextUserId: number;
   readonly users: readonly User[];
 }
 
-type UserInput = Pick<SeedUser, "name" | "locale">;
+type UserInput = typeof UserWriteInput.Type;
+type CreateLimitError =
+  | typeof DirectoryCapacityExceeded.Type
+  | typeof DirectoryWriteQuotaExceeded.Type;
 
-const UserFields = Schema.Struct(SeedUser.fields);
-const isUserInput = Schema.is(UserFields);
-const isSeedInput = Schema.is(Schema.Array(UserFields));
+const isUserInput = Schema.is(UserWriteInput);
+const isSeedInput = Schema.is(Schema.Array(UserWriteInput));
 const isUserLocale = Schema.is(UserLocale);
 
 const initialState = (): ServerState => ({
+  createWindow: { accepted: 0, expiresAt: 0 },
   nextUserId: initialUsers.length + 1,
   users: initialUsers.map((user, index) => makeUser(index + 1, user)),
 });
@@ -54,42 +66,56 @@ export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
       readonly users: readonly UserInput[];
     }) {
       if (users.length > directoryLimits.users) {
-        return yield* Effect.fail("directory-capacity-exceeded" as const);
+        return yield* Effect.fail(DirectoryCapacityExceeded.literal);
       }
       if (!isSeedInput(users)) {
-        return yield* Effect.fail("invalid-user-input" as const);
+        return yield* Effect.fail(InvalidUserInput.literal);
       }
       const seeded = Object.freeze(
         users.map((user, index) => makeUser(index + 1, user))
       );
-      yield* Ref.set(state, {
+      yield* Ref.update(state, (current) => ({
+        ...current,
         nextUserId: seeded.length + 1,
         users: seeded,
-      });
+      }));
       return seeded;
     }),
     create: Effect.fn("ExampleUsers.create")(function* (payload: UserInput) {
       if (!isUserInput(payload)) {
-        return yield* Effect.fail("invalid-user-input" as const);
+        return yield* Effect.fail(InvalidUserInput.literal);
       }
-      const created = yield* Ref.modify(state, (current) => {
+      const now = yield* Clock.currentTimeMillis;
+      return yield* Ref.modify<
+        ServerState,
+        Result.Result<User, CreateLimitError>
+      >(state, (current) => {
         if (current.users.length >= directoryLimits.users) {
-          return [undefined, current] as const;
+          return [
+            Result.fail(DirectoryCapacityExceeded.literal),
+            current,
+          ] as const;
+        }
+        const window =
+          now < current.createWindow.expiresAt
+            ? current.createWindow
+            : { accepted: 0, expiresAt: now + directoryWriteQuota.windowMs };
+        if (window.accepted >= directoryWriteQuota.creates) {
+          return [
+            Result.fail(DirectoryWriteQuotaExceeded.literal),
+            current,
+          ] as const;
         }
         const user = makeUser(current.nextUserId, payload);
         return [
-          user,
+          Result.succeed(user),
           {
-            ...current,
+            createWindow: { ...window, accepted: window.accepted + 1 },
             nextUserId: current.nextUserId + 1,
             users: [...current.users, user],
           },
         ] as const;
-      });
-      if (created === undefined) {
-        return yield* Effect.fail("directory-capacity-exceeded" as const);
-      }
-      return created;
+      }).pipe(Effect.flatMap(Effect.fromResult));
     }),
     delete: Effect.fn("ExampleUsers.delete")(
       ({ id, revision }: Pick<User, "id" | "revision">) =>
@@ -120,7 +146,7 @@ export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
       readonly locale?: string;
     }) {
       if (locale !== undefined && !isUserLocale(locale)) {
-        return yield* Effect.fail("invalid-user-input" as const);
+        return yield* Effect.fail(InvalidUserInput.literal);
       }
       const current = yield* Ref.get(state);
       const user = current.users.find((candidate) => candidate.id === id);
@@ -137,7 +163,7 @@ export const makeUsers = Effect.fn("ExampleUsers.make")(function* () {
     list: Effect.fn("ExampleUsers.list")(() =>
       Ref.get(state).pipe(
         Effect.map((current) =>
-          current.users.slice(0, directoryLimits.firstPageSize)
+          current.users.slice(0, directoryLimits.previewSize)
         )
       )
     ),

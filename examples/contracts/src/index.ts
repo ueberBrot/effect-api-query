@@ -5,11 +5,14 @@ export {
   DiagnosticFailure,
   DiagnosticOperationStatus,
   DiagnosticStatus,
+  DirectoryCapacityExceeded,
   directoryLimits,
+  DirectoryWriteQuotaExceeded,
   exampleRpcGroup,
   ExampleAuthorization,
   ExampleAuthorizationError,
   InvalidOperationInput,
+  InvalidUserInput,
   maxDiagnosticDurationMs,
   OperationCapacityExceeded,
   OperationId,
@@ -19,6 +22,7 @@ export {
   User,
   UserLocale,
   UserPage,
+  UserWriteInput,
 } from "./contracts.ts";
 export type { CommandPayload, SlowDiagnosticInput } from "./contracts.ts";
 export { exampleHttpApi, ExampleHttpAuthorization } from "./http-api.ts";

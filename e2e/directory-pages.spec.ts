@@ -2,6 +2,7 @@ import { directoryLimits } from "@effect-api-query/contracts";
 import { expect } from "@playwright/test";
 
 import {
+  enableDemoWrites,
   exampleTest as test,
   isHttpRequest,
   recordsRpc,
@@ -14,8 +15,9 @@ for (const exampleHost of ["start", "standalone"] as const) {
     test("shows a bounded preview and loads users beyond it on demand", async ({
       exampleUrl,
       page,
+      writeToken,
     }) => {
-      const extraUsers = directoryLimits.firstPageSize - 12 + 1;
+      const extraUsers = directoryLimits.previewSize - 12 + 1;
       const lastName = `Additional user ${String(extraUsers)}`;
       for (let index = 1; index <= extraUsers; index += 1) {
         // oxlint-disable-next-line eslint/no-await-in-loop
@@ -74,15 +76,35 @@ for (const exampleHost of ["start", "standalone"] as const) {
         const html = await httpDocument?.text();
         expect(html).toContain("Additional user 1");
         expect(html).not.toContain(lastName);
-        await page
-          .getByRole("button", { name: "Read cached HTTP directory" })
-          .click();
-        await expect(
-          page.getByText("HTTP cached directory: 16 users")
-        ).toBeVisible();
-        await expect(page.getByText("HTTP: 4 of 17 loaded")).toBeVisible();
-        expect(requests).toEqual([]);
       }
+      await page
+        .getByRole("button", { name: "Read cached HTTP directory" })
+        .click();
+      await expect(
+        page.getByText("HTTP cached directory: 16 users")
+      ).toBeVisible();
+      await expect(page.getByText("HTTP: 4 of 17 loaded")).toBeVisible();
+      if (exampleHost === "start") {
+        expect(requests).toEqual([]);
+      } else {
+        await expect(
+          page.getByRole("button", { name: `Delete ${lastName}`, exact: true })
+        ).toBeVisible();
+      }
+      await enableDemoWrites(page, writeToken);
+      /* oxlint-disable eslint/no-await-in-loop */
+      for (const loaded of [8, 12, 16, 17]) {
+        await page.getByRole("button", { name: "Load next HTTP page" }).click();
+        await expect(
+          page.getByText(`HTTP: ${String(loaded)} of 17 loaded`)
+        ).toBeVisible();
+      }
+      /* oxlint-enable eslint/no-await-in-loop */
+      await page
+        .getByRole("button", { name: `Delete HTTP ${lastName}` })
+        .click();
+      await expect(page.getByText("HTTP: 16 of 16 loaded")).toBeVisible();
+      await expect(page.getByText(lastName, { exact: false })).toHaveCount(0);
     });
   });
 }
