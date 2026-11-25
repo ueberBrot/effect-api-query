@@ -233,6 +233,9 @@ overrides:
   vite@*: npm:@voidzero-dev/vite-plus-core@1.6.0
   vitest@*: 5.1.0
 
+patchedDependencies:
+  '@tanstack/intent@0.5.6': a59fb8cb4255a6f53f9b3dbd331c0c9b78e009ddbcaef0706ce139b377a76721
+
 importers:
 
   .:
@@ -272,7 +275,7 @@ importers:
         version: 0.2.3
       '@tanstack/intent':
         specifier: 0.5.6
-        version: 0.5.6
+        version: 0.5.6(patch_hash=a59fb8cb4255a6f53f9b3dbd331c0c9b78e009ddbcaef0706ce139b377a76721)
       '@tanstack/query-core':
         specifier: 'catalog:'
         version: 5.107.1
@@ -6523,7 +6526,7 @@ snapshots:
 
   '@tanstack/history@1.162.5': {}
 
-  '@tanstack/intent@0.5.6': {}
+  '@tanstack/intent@0.5.6(patch_hash=a59fb8cb4255a6f53f9b3dbd331c0c9b78e009ddbcaef0706ce139b377a76721)': {}
 
   '@tanstack/query-core@5.107.1': {}
 

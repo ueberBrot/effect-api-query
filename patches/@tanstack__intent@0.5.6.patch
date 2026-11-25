@@ -1,0 +1,10 @@
+diff --git a/dist/cli.mjs b/dist/cli.mjs
+index 4e3a3ff0e829ef4b8a53d26c222e661786e5c575..fdc283542bbe5e4061ee3104978c9fde2b833194 100755
+--- a/dist/cli.mjs
++++ b/dist/cli.mjs
+@@ -758,4 +758,4 @@ if (isMainModule(import.meta.url, process.argv[1])) {
+-	process.exit(exitCode);
++	process.exitCode = exitCode;
+ }
+ //#endregion
+ export { isMainModule, main };

@@ -133,6 +133,7 @@ try {
       "package.json",
       "pnpm-lock.yaml",
       "pnpm-workspace.yaml",
+      "patches",
       "tsconfig.json",
       "examples",
       "apps/docs/package.json",

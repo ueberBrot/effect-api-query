@@ -1,13 +1,6 @@
 import { deepStrictEqual, ok } from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import {
-  closeSync,
-  mkdtempSync,
-  openSync,
-  readFileSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
 import { parseEnv } from "node:util";
@@ -132,90 +125,87 @@ await withVersioningCheckout(async (checkout) => {
       "Release generation must preserve existing changelog entries."
     );
 
+    const output = execFileSync(
+      "vp",
+      ["exec", "intent", "maintainer", "review", "--base", base, "--json"],
+      {
+        ...options,
+        encoding: "utf-8",
+        maxBuffer: Infinity,
+        stdio: ["ignore", "pipe", "inherit"],
+      }
+    );
+    /* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters -- Parse the installed Intent CLI JSON at the input boundary. */
+    const input: unknown = JSON.parse(output);
+    ok(
+      input !== null &&
+        typeof input === "object" &&
+        "items" in input &&
+        Array.isArray(input.items),
+      "Expected an Intent review report."
+    );
+    const report = {
+      ...input,
+      items: input.items.map((item: unknown) => {
+        ok(
+          item !== null &&
+            typeof item === "object" &&
+            "id" in item &&
+            typeof item.id === "string" &&
+            "kind" in item &&
+            typeof item.kind === "string" &&
+            "path" in item &&
+            typeof item.path === "string" &&
+            "changedFiles" in item &&
+            Array.isArray(item.changedFiles) &&
+            "problems" in item &&
+            Array.isArray(item.problems),
+          "Expected a native Intent review item."
+        );
+        return {
+          ...item,
+          id: item.id,
+          kind: item.kind,
+          path: item.path,
+          changedFiles: item.changedFiles.map(String),
+          problemCount: item.problems.length,
+        };
+      }),
+    };
+    /* oxlint-enable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters */
+    const reviewed = report.items.map((item) => {
+      ok(
+        item.problemCount === 0 &&
+          item.changedFiles.length > 0 &&
+          item.changedFiles.every((path) => generated.has(path)),
+        `Release generation cannot review unrelated work: ${item.id}`
+      );
+      ok(
+        (item.kind === "source" && generated.has(item.path)) ||
+          (["skill", "planning"].includes(item.kind) &&
+            item.changedFiles.every((path) => path === "package.json")),
+        `Unexpected release review item: ${item.id}`
+      );
+      return {
+        ...item,
+        outcome: "no-change",
+        reason:
+          item.kind === "source"
+            ? "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged."
+            : "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
+        evidence: [
+          `Before versioning: intent maintainer check passed at ${base}.`,
+          `changeset version and vp fmt generated ${previousVersion} -> ${version}.`,
+          "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+          `Scoped generated changes: ${item.changedFiles.join(", ")}.`,
+        ],
+      };
+    });
     const directory = mkdtempSync(
       nodePath.join(tmpdir(), "release-intent-review-")
     );
     try {
       const reportPath = nodePath.join(directory, "review.json");
-      const output = openSync(reportPath, "wx");
-      try {
-        execFileSync(
-          "vp",
-          ["exec", "intent", "maintainer", "review", "--base", base, "--json"],
-          {
-            ...options,
-            stdio: ["ignore", output, "inherit"],
-          }
-        );
-      } finally {
-        closeSync(output);
-      }
-      /* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters -- Parse the installed Intent CLI JSON at the input boundary. */
-      const input: unknown = JSON.parse(read(reportPath));
-      ok(
-        input !== null &&
-          typeof input === "object" &&
-          "items" in input &&
-          Array.isArray(input.items),
-        "Expected an Intent review report."
-      );
-      const report = {
-        ...input,
-        items: input.items.map((item: unknown) => {
-          ok(
-            item !== null &&
-              typeof item === "object" &&
-              "id" in item &&
-              typeof item.id === "string" &&
-              "kind" in item &&
-              typeof item.kind === "string" &&
-              "path" in item &&
-              typeof item.path === "string" &&
-              "changedFiles" in item &&
-              Array.isArray(item.changedFiles) &&
-              "problems" in item &&
-              Array.isArray(item.problems),
-            "Expected a native Intent review item."
-          );
-          return {
-            ...item,
-            id: item.id,
-            kind: item.kind,
-            path: item.path,
-            changedFiles: item.changedFiles.map(String),
-            problemCount: item.problems.length,
-          };
-        }),
-      };
-      /* oxlint-enable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters */
-      const reviewed = report.items.map((item) => {
-        ok(
-          item.problemCount === 0 &&
-            item.changedFiles.length > 0 &&
-            item.changedFiles.every((path) => generated.has(path)),
-          `Release generation cannot review unrelated work: ${item.id}`
-        );
-        ok(
-          (item.kind === "source" && generated.has(item.path)) ||
-            (["skill", "planning"].includes(item.kind) &&
-              item.changedFiles.every((path) => path === "package.json")),
-          `Unexpected release review item: ${item.id}`
-        );
-        return {
-          ...item,
-          outcome: "no-change",
-          reason:
-            item.kind === "source"
-              ? "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged."
-              : "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
-          evidence: [
-            `Before versioning: intent maintainer check passed at ${base}.`,
-            `changeset version and vp fmt generated ${previousVersion} -> ${version}.`,
-            "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
-            `Scoped generated changes: ${item.changedFiles.join(", ")}.`,
-          ],
-        };
-      });
       writeFileSync(reportPath, JSON.stringify({ ...report, items: reviewed }));
       run(["exec", "intent", "maintainer", "review", "--record", reportPath]);
       run(["fmt", ".intent/review-state.json"]);

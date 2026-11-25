@@ -1,9 +1,12 @@
-import { execFileSync, spawnSync } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
+import { once } from "node:events";
 import {
+  closeSync,
   cpSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
+  openSync,
   readFileSync,
   rmSync,
   symlinkSync,
@@ -11,8 +14,17 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
+import { buffer } from "node:stream/consumers";
+import { setTimeout as delay } from "node:timers/promises";
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+  onTestFinished,
+} from "vitest";
 
 import { fixtureGitEnvironment } from "./fixtures/git-environment";
 
@@ -70,20 +82,19 @@ const withCommand = (cwd: string, command: "git" | "vp", script: string) => {
   };
 };
 
-const withCheckout = (test: (cwd: string) => void) => {
+const withCheckout = <Result>(test: (cwd: string) => Result): Result => {
   const cwd = mkdtempSync(nodePath.join(tmpdir(), "version-packages-case-"));
-  try {
-    git(cwd, "clone", "--shared", fixture, ".");
-    git(cwd, "config", "user.name", "Release test");
-    git(cwd, "config", "user.email", "release-test@example.invalid");
-    symlinkSync(
-      nodePath.join(repository, "node_modules"),
-      nodePath.join(cwd, "node_modules")
-    );
-    test(cwd);
-  } finally {
+  onTestFinished(() => {
     rmSync(cwd, { recursive: true, force: true });
-  }
+  });
+  git(cwd, "clone", "--shared", fixture, ".");
+  git(cwd, "config", "user.name", "Release test");
+  git(cwd, "config", "user.email", "release-test@example.invalid");
+  symlinkSync(
+    nodePath.join(repository, "node_modules"),
+    nodePath.join(cwd, "node_modules")
+  );
+  return test(cwd);
 };
 
 describe("Changesets Intent review integration", () => {
@@ -416,6 +427,43 @@ exec "$FIXTURE_COMMAND" "$@"
     });
   }, 30_000);
 
+  it.each([
+    {
+      report: '{"items":[]}',
+      status: 23,
+      error: "Fixture review command failed.",
+    },
+    { report: '{"items":', status: 0, error: "SyntaxError" },
+  ])(
+    "isolates a failed Intent report capture with exit $status",
+    ({ report, status, error }) => {
+      withCheckout((cwd) => {
+        const worktrees = git(cwd, "worktree", "list", "--porcelain");
+        const env = withCommand(
+          cwd,
+          "vp",
+          `
+if [ "$1 $2 $3 $4 $5 $7" = "exec intent maintainer review --base --json" ]; then
+  printf '%s' '${report}'
+  if [ ${status} -ne 0 ]; then
+    printf '%s\\n' 'Fixture review command failed.' >&2
+  fi
+  exit ${status}
+fi
+exec "$FIXTURE_COMMAND" "$@"
+`
+        );
+        const result = version(cwd, env);
+        expect(result.status).toBe(1);
+        expect(result.stderr).toContain(error);
+        expect(git(cwd, "status", "--porcelain")).toBe("");
+        expect(git(cwd, "worktree", "list", "--porcelain")).toBe(worktrees);
+        expect(version(cwd).status).toBe(0);
+      });
+    },
+    30_000
+  );
+
   it("preserves ignored .env settings for the changelog generator", () => {
     withCheckout((cwd) => {
       write(cwd, ".git/local-excludes", ".env\n");
@@ -505,12 +553,53 @@ exec "$FIXTURE_COMMAND" "$@"
     });
   }, 30_000);
 
-  it("records review reports larger than the CLI pipe buffer", () => {
-    withCheckout((cwd) => {
-      for (let index = 0; index < 450; index += 1) {
-        write(cwd, `src/value-${index}.ts`, "export const value = 1;\n");
+  it("drains multi-megabyte Intent reports and records the generated release", async () => {
+    await withCheckout(async (cwd) => {
+      const name = "fixture-source-".repeat(14);
+      for (let index = 0; index < 3000; index += 1) {
+        write(cwd, `src/${name}${index}.ts`, "export const value = 1;\n");
       }
       commit(cwd);
+
+      const cli = nodePath.join(
+        repository,
+        "node_modules/@tanstack/intent/dist/cli.mjs"
+      );
+      const options = { cwd, env: fixtureEnv };
+      const reportPath = nodePath.join(cwd, ".git", "report.json");
+      const expectCompletePipe = async (command: string[], status: number) => {
+        const args = [cli, ...command];
+        const output = openSync(reportPath, "w");
+        try {
+          const file = spawnSync(process.execPath, args, {
+            ...options,
+            stdio: ["ignore", output, "pipe"],
+          });
+          expect(file.status).toBe(status);
+        } finally {
+          closeSync(output);
+        }
+        const expected = readFileSync(reportPath);
+        expect(expected.length).toBeGreaterThan(2 * 1024 * 1024);
+        expect(() => {
+          JSON.parse(expected.toString("utf-8"));
+        }).not.toThrow();
+
+        const child = spawn(process.execPath, args, {
+          ...options,
+          stdio: ["ignore", "pipe", "inherit"],
+        });
+        const closed = once(child, "close");
+        await once(child.stdout, "readable");
+        await delay(50);
+        const actual = await buffer(child.stdout);
+        await expect(closed).resolves.toStrictEqual([status, null]);
+        expect(actual).toHaveLength(expected.length);
+        expect(actual.equals(expected)).toBe(true);
+      };
+      await expectCompletePipe(["maintainer", "review", "--json"], 0);
+      await expectCompletePipe(["review", "--json", "--check"], 1);
+
       intent(
         cwd,
         "review",

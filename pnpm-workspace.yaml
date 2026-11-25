@@ -49,3 +49,7 @@ overrides:
 peerDependencyRules:
   allowedVersions:
     vite: 1.6.0
+
+patchedDependencies:
+  # Let piped CLI output drain on exit. Drop when the pinned Intent release includes the fix.
+  "@tanstack/intent@0.5.6": patches/@tanstack__intent@0.5.6.patch
