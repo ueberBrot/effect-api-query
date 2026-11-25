@@ -97,6 +97,19 @@ const withCheckout = <Result>(test: (cwd: string) => Result): Result => {
   return test(cwd);
 };
 
+const expectRetryableVersioningFailure = (
+  cwd: string,
+  env: NodeJS.ProcessEnv
+) => {
+  const worktrees = git(cwd, "worktree", "list", "--porcelain");
+  const result = version(cwd, env);
+  expect(result.status).toBe(1);
+  expect(git(cwd, "status", "--porcelain")).toBe("");
+  expect(git(cwd, "worktree", "list", "--porcelain")).toBe(worktrees);
+  expect(version(cwd).status).toBe(0);
+  return result.stderr;
+};
+
 describe("Changesets Intent review integration", () => {
   beforeAll(() => {
     git(fixture, "init", "--initial-branch=main");
@@ -402,7 +415,6 @@ exec "$FIXTURE_COMMAND" "$@"
 
   it("retries after validation fails following a recorded Intent review", () => {
     withCheckout((cwd) => {
-      const worktrees = git(cwd, "worktree", "list", "--porcelain");
       const env = withCommand(
         cwd,
         "vp",
@@ -414,31 +426,25 @@ fi
 exec "$FIXTURE_COMMAND" "$@"
 `
       );
-      const result = version(cwd, env);
-      expect(result.status).toBe(1);
-      expect(result.stderr).toContain(
+      expect(expectRetryableVersioningFailure(cwd, env)).toContain(
         "Fixture validation failed after review."
       );
-      expect(git(cwd, "status", "--porcelain")).toBe("");
-      expect(git(cwd, "worktree", "list", "--porcelain")).toBe(worktrees);
-
-      run(cwd, "vp", ["run", "version-packages"]);
       expect(intent(cwd, "check")).toContain("0 pending review item(s)");
     });
   }, 30_000);
 
   it.each([
     {
-      report: '{"items":[]}',
+      report: '{"items":[],"marker":"private fixture report"}',
       status: 23,
-      error: "Fixture review command failed.",
+      error:
+        /Fixture review command failed\..*intent maintainer review failed \(exit 23\)\./su,
     },
-    { report: '{"items":', status: 0, error: "SyntaxError" },
+    { report: '{"items":', status: 0, error: /SyntaxError/u },
   ])(
     "isolates a failed Intent report capture with exit $status",
     ({ report, status, error }) => {
       withCheckout((cwd) => {
-        const worktrees = git(cwd, "worktree", "list", "--porcelain");
         const env = withCommand(
           cwd,
           "vp",
@@ -453,12 +459,9 @@ fi
 exec "$FIXTURE_COMMAND" "$@"
 `
         );
-        const result = version(cwd, env);
-        expect(result.status).toBe(1);
-        expect(result.stderr).toContain(error);
-        expect(git(cwd, "status", "--porcelain")).toBe("");
-        expect(git(cwd, "worktree", "list", "--porcelain")).toBe(worktrees);
-        expect(version(cwd).status).toBe(0);
+        const stderr = expectRetryableVersioningFailure(cwd, env);
+        expect(stderr).toMatch(error);
+        expect(stderr).not.toContain("private fixture report");
       });
     },
     30_000

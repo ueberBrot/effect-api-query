@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "72dab7dc08a6075c7858d4c05ef4c0b47e7287015a85994e18051608e110dab4",
+      "fingerprint": "d44fadcafc3e859d849b60e85e7e5cc8ec211878e60614c075feded00a20f5fb",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -232,7 +232,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "48814c51d66f025835c70d71ab9a6960792055ceb5541ff498b876af4a0acaf8",
+        "scripts/version-packages.mts": "317026f7313c485748a888893f27186dbc28e2dd231a7b81d8024e68e70112c8",
         "skills/effect-api-query/SKILL.md": "4778388e6b0e695d1d4f05bbece5cf65d05ac489b3cdf46712e2c9e009c0ce59",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "efd340201e3cd309fa4bd1bedacd5ed8288b2b67dcecaac65d35a7dfcc49863d",
@@ -436,20 +436,21 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "ae3fb53c4f8e1f7723345374749c9130aa7f1a6b40a306d77b2918ba75c8985f",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "8db0f5b874ed3413802d51c533c00a2bc5228d4d54a5bc6f8ff4b8f3ad3dae6b",
+        "tests/version-packages.test.ts": "a69126c4ce57ab4099b724de8abd3377933d6641f96d9784d3186483ade99f64",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e6ae26bbaf62f635f0a02847cca900c5b191f832",
+      "head": "f27e08ac19afdb5df118fa0948f61ee155d9c0be",
       "outcome": "no-change",
       "reason": "The Intent dev CLI now drains review output on exit. Versioning reads the pipe, and the isolated packed consumer still checks the same library peer versions and compiler contracts.",
       "evidence": [
         "The pinned CLI patch changes only dist/cli.mjs shutdown. Package exports, peer ranges, and runtime sources are identical to e6ae26bb.",
-        "vp run --no-cache effect-compatibility passed both compiler suites and 492 packed runtime tests."
+        "vp run --no-cache effect-compatibility passed both compiler suites and 492 packed runtime tests.",
+        "The versioning fixture passes with a complete piped report. Removing the enlarged capture limit fails with ENOBUFS. The diagnostics and retry fixtures pass."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "0b9b4b3d24afd3b847803bb187dbc7982a18da00a3176be2037672c7d0d5243e",
+      "fingerprint": "a2e6ccee6b6b87de669f816d535b518cbdb46dbe2ca641c58719d4dfa1984707",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -681,7 +682,7 @@
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/version-packages.mts": "48814c51d66f025835c70d71ab9a6960792055ceb5541ff498b876af4a0acaf8",
+        "scripts/version-packages.mts": "317026f7313c485748a888893f27186dbc28e2dd231a7b81d8024e68e70112c8",
         "skills/effect-api-query/SKILL.md": "4778388e6b0e695d1d4f05bbece5cf65d05ac489b3cdf46712e2c9e009c0ce59",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
         "skills/effect-api-query/references/frameworks-and-hosts.md": "efd340201e3cd309fa4bd1bedacd5ed8288b2b67dcecaac65d35a7dfcc49863d",
@@ -885,16 +886,17 @@
         "tests/types/type-scale.ts": "0a6472b438c7ef14c3ee5b030b500ab6f66f13e7cd50250a3b0798bdec48c8a7",
         "tests/types/utility-configuration-contract.ts": "ae3fb53c4f8e1f7723345374749c9130aa7f1a6b40a306d77b2918ba75c8985f",
         "tests/utility-configuration.test.ts": "55361de62fbb7e7695c94f940de566c2e35d218539a77b6ab1000877f71ad288",
-        "tests/version-packages.test.ts": "8db0f5b874ed3413802d51c533c00a2bc5228d4d54a5bc6f8ff4b8f3ad3dae6b",
+        "tests/version-packages.test.ts": "a69126c4ce57ab4099b724de8abd3377933d6641f96d9784d3186483ade99f64",
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "e6ae26bbaf62f635f0a02847cca900c5b191f832",
+      "head": "f27e08ac19afdb5df118fa0948f61ee155d9c0be",
       "outcome": "no-change",
       "reason": "The domain map retains the same dependency-selection task, the skill spec retains the same packed compatibility checks, and the skill tree retains its existing source mappings for the workspace configuration, scripts, and tests.",
       "evidence": [
         "The compatibility script copies patches into the disposable workspace and still checks the existing pinned Effect and Query Core matrix.",
-        "vp run --no-cache effect-compatibility passed with both compilers and 492 runtime tests."
+        "vp run --no-cache effect-compatibility passed with both compilers and 492 runtime tests.",
+        "The versioning fixture passes with a complete piped report. Removing the enlarged capture limit fails with ENOBUFS. The diagnostics and retry fixtures pass."
       ]
     },
     "source:vite.config.ts": {

@@ -1,5 +1,5 @@
 import { deepStrictEqual, ok } from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import nodePath from "node:path";
@@ -125,7 +125,7 @@ await withVersioningCheckout(async (checkout) => {
       "Release generation must preserve existing changelog entries."
     );
 
-    const output = execFileSync(
+    const review = spawnSync(
       "vp",
       ["exec", "intent", "maintainer", "review", "--base", base, "--json"],
       {
@@ -135,8 +135,15 @@ await withVersioningCheckout(async (checkout) => {
         stdio: ["ignore", "pipe", "inherit"],
       }
     );
+    if (review.error) {
+      throw review.error;
+    }
+    ok(
+      review.status === 0,
+      `intent maintainer review failed (${review.signal ?? `exit ${review.status}`}).`
+    );
     /* oxlint-disable anti-slop/no-runtime-typeof, anti-slop/no-unknown-parameters -- Parse the installed Intent CLI JSON at the input boundary. */
-    const input: unknown = JSON.parse(output);
+    const input: unknown = JSON.parse(review.stdout);
     ok(
       input !== null &&
         typeof input === "object" &&
