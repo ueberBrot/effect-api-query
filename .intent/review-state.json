@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "2b87c2e09fc6334990aa7a5e12de7393da8a14c03c775fcd24f9a2924ca44299",
+      "fingerprint": "552d086d6beb5f709eb9d7ad3ba7c01c7d9c3d66ffb912802b6e84a1bcbf07a3",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -17,14 +17,12 @@
         "apps/docs/src/content/docs/examples.md": "77f6904260f592759f3ef946c2b65d6ffa391275e93d16b6c9304be992f317ad",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "759e702c2cd34e13d27ef28879bea41488da6f6be8f95ef8ccb6c35adf26781a",
         "apps/docs/src/content/docs/examples/http-workflows.md": "0b259f91c3616f33691d85b94b83fd0c43329a8414ca0c672e9034f78032c40a",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "1afaa45bfc3b29d8405adfaedcf4d9d20e6e277eb0dd1874b61d74b2686fc8a6",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -216,7 +214,7 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "fde08586436bcd4973ae8fe9b5bd117131d1a0a66574f9fcbd38a248310b701a",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
+        "package.json": "9eef49370fda8876e76103ed6a587d6019164a9b4c1254a32c8c1d94fbbbc8a7",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
@@ -233,9 +231,7 @@
         "scripts/performance/budgets.mts": "4d23aab39d00302fb525fef5679fc37f74c4902c83037aeb376b85b8795727d8",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
-        "scripts/verify-docs-examples.mts": null,
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "9111d806ff39aa4de6d485ec72a0a9bc5f7feb4bd8694a3e7187c7cd6abf9c54",
         "skills/effect-api-query/SKILL.md": "4778388e6b0e695d1d4f05bbece5cf65d05ac489b3cdf46712e2c9e009c0ce59",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
@@ -445,17 +441,18 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8863dd744480d8f806137c48cb49938df24de171",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Only internal release checkout scripts and versioning tests changed to create worktree/node_modules as a directory of entry symlinks so Git ignores it under node_modules/; public API, consumer guidance, and planning records are unchanged.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Edited scripts/lib/versioning-checkout.mts, scripts/version-packages.mts, and tests/version-packages.test.ts only.",
-        "Passed tests/version-packages.test.ts (25/25), tests/workflow-guards.test.ts (20/20), and tests/skills-maintenance.test.ts (7/7), including trailing-slash .gitignore and unexpected untracked file regressions.",
-        "Passed vp fmt, effect-tsgo vp check, vp run fallow, vp run effect-check, vp run toolchain-check, and vp run repository-check."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "d8b60d90895acb2115a9862714365f13e6f700b75bbaf8dfa8f3d6df505f65c2",
+      "fingerprint": "7a5fd31932224875f21fc6eafbe008b06c5de1466e7bedd85dc2866d7fad096c",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -472,14 +469,12 @@
         "apps/docs/src/content/docs/examples.md": "77f6904260f592759f3ef946c2b65d6ffa391275e93d16b6c9304be992f317ad",
         "apps/docs/src/content/docs/examples/cancellable-commands.md": "759e702c2cd34e13d27ef28879bea41488da6f6be8f95ef8ccb6c35adf26781a",
         "apps/docs/src/content/docs/examples/http-workflows.md": "0b259f91c3616f33691d85b94b83fd0c43329a8414ca0c672e9034f78032c40a",
-        "apps/docs/src/content/docs/getting-started/compatibility-and-stability.md": null,
         "apps/docs/src/content/docs/getting-started/feature-support.md": "a4ba730fc86ed8acb65cb6ad20952199b164e9004a959931ca373576e67fa82f",
         "apps/docs/src/content/docs/getting-started/http-quick-start.md": "8cff47f4df524507c0830f91fd380312a511ff288b81c4dc554aee9808f18304",
         "apps/docs/src/content/docs/getting-started/installation.md": "d9a98e0cf8a0f5d105546866c5e5a5a40ceb8302bb9e04f8ab66df70c6836309",
         "apps/docs/src/content/docs/getting-started/quick-start.md": "0818a1a00890f6dc9d9c1f9d621b1ea89c6ddb5547f2c9a0a28ded12a33fc31f",
         "apps/docs/src/content/docs/guides/angular-query.md": "16afe6996ee8f70b4b77b430c93aeb2a4dc658a0ae8e92b3993d95f065a86b9f",
         "apps/docs/src/content/docs/guides/cache-filters.md": "1afaa45bfc3b29d8405adfaedcf4d9d20e6e277eb0dd1874b61d74b2686fc8a6",
-        "apps/docs/src/content/docs/guides/cache-management.md": null,
         "apps/docs/src/content/docs/guides/cancellation.md": "a81bee4250161714fa784d674867395373663969ca53f1a3f8dc7e31a90712b9",
         "apps/docs/src/content/docs/guides/choose-stream-history.md": "0149fc31d768147ff34912c95ac0daf5b407137b1f690b2620b765429b858bc5",
         "apps/docs/src/content/docs/guides/conditional-queries.md": "76cab248df8fbb9b4d29db532c44a98bcbbf18417581e46b78ca0181ecb5f609",
@@ -671,7 +666,7 @@
         "examples/vite-react/tests/suspense-recovery.test.tsx": "8d10142e7cc8809f80d9d7f1edba04a6a5eca0f4b955139e1bf13a517a160ca0",
         "examples/vite-react/tests/user-writes.test.ts": "fde08586436bcd4973ae8fe9b5bd117131d1a0a66574f9fcbd38a248310b701a",
         "examples/vite-react/vite.config.ts": "68b64cb963fcb1fa90330d04519202729d9e692229d25f81a26c14a3733362d9",
-        "package.json": "d5b7f7ffaedf4964b16816d89d355564a255cc7692078fcd84546d71c04a88a3",
+        "package.json": "9eef49370fda8876e76103ed6a587d6019164a9b4c1254a32c8c1d94fbbbc8a7",
         "pnpm-workspace.yaml": "fc4bff1fa9ef4a4887691c6e004e02829736f93ee07efcb563f78f836a21a276",
         "scripts/check-changesets.mts": "f6873750bad442963f37471471a1ceada69ebf3593d9993586a73bce269e5edb",
         "scripts/check-effect-compatibility.mts": "b1de824e27e34089c445f183d1511d8e5f9e463892ff8edf83f76fb8c24778f4",
@@ -688,9 +683,7 @@
         "scripts/performance/budgets.mts": "4d23aab39d00302fb525fef5679fc37f74c4902c83037aeb376b85b8795727d8",
         "scripts/performance/common.mts": "6ce0e1c018e08a442fcf787740d7ddd63457069ee932d28b04d8a1b41e136028",
         "scripts/resolve-docs-release.mts": "0ed8db1359b317feadf9479fc7dcefc879b4899279b56c672a95499595644c4e",
-        "scripts/verify-docs-examples.mts": null,
         "scripts/verify-docs-version.mts": "58f63de6f871726a5bef8b70d1de7fad591374c52823e3cf60a160a9f37541e8",
-        "scripts/verify-packed-consumer.mts": null,
         "scripts/version-packages.mts": "9111d806ff39aa4de6d485ec72a0a9bc5f7feb4bd8694a3e7187c7cd6abf9c54",
         "skills/effect-api-query/SKILL.md": "4778388e6b0e695d1d4f05bbece5cf65d05ac489b3cdf46712e2c9e009c0ce59",
         "skills/effect-api-query/references/cache-workflows.md": "21356f8177d20dbbb861dc6620bb70906b1fc8e196ef8fac52f65cd38a01fb9c",
@@ -900,13 +893,14 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "8863dd744480d8f806137c48cb49938df24de171",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Only internal release checkout scripts and versioning tests changed to create worktree/node_modules as a directory of entry symlinks so Git ignores it under node_modules/; public API, consumer guidance, and planning records are unchanged.",
+      "reason": "Only the package version changed. Shipped guidance and all three planning records retain their reviewed tasks, source mappings, and behavior.",
       "evidence": [
-        "Edited scripts/lib/versioning-checkout.mts, scripts/version-packages.mts, and tests/version-packages.test.ts only.",
-        "Passed tests/version-packages.test.ts (25/25), tests/workflow-guards.test.ts (20/20), and tests/skills-maintenance.test.ts (7/7), including trailing-slash .gitignore and unexpected untracked file regressions.",
-        "Passed vp fmt, effect-tsgo vp check, vp run fallow, vp run effect-check, vp run toolchain-check, and vp run repository-check."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: package.json."
       ]
     },
     "source:vite.config.ts": {
@@ -2038,16 +2032,16 @@
       ]
     },
     "source:CHANGELOG.md": {
-      "fingerprint": "8b48754956198bd7408d0f98d3d035793a34336d832398cd587cc242ec4b8f99",
+      "fingerprint": "29f4ac582845e697176fd5b8c02974e1d9b7041707b3780562fbbf1824daab71",
       "snapshot": {
-        "CHANGELOG.md": "8d8306abfdaf0b4fd35924784721dc4572e758b4c1a53801fa33753df50ebd44"
+        "CHANGELOG.md": "666e8fa2a00bd12c57803e4007cb82739bf107ec09ea7dd3227cd8ebe13ffe40"
       },
-      "head": "e603455ecf5fb888c84417a9fab559c1fcc32624",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
       "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Before versioning: intent maintainer check passed at e603455ecf5fb888c84417a9fab559c1fcc32624.",
-        "changeset version and vp fmt generated 0.7.1 -> 0.8.0.",
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
         "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
         "Scoped generated changes: CHANGELOG.md."
       ]
@@ -4676,63 +4670,78 @@
       ]
     },
     "source:.changeset/preserve-repeated-http-wire-parameter-order.md": {
-      "fingerprint": "9ca45718be476d5d63c5f5e8bcf51ca3e61d54cf7f1c5a6cb52b5178552f5b46",
+      "fingerprint": "a504dac03f8daefaffc17202cad33c6f6a50d5cb37eaf10df363e70bf15ca6c9",
       "snapshot": {
-        ".changeset/preserve-repeated-http-wire-parameter-order.md": "129ecfe2f7f1049cdb2c814555c340abb3afd75669da7303e996433d6575ef67"
+        ".changeset/preserve-repeated-http-wire-parameter-order.md": null
       },
-      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/preserve-repeated-http-wire-parameter-order.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-repeated-http-wire-parameter-order.md."
       ]
     },
     "source:.changeset/require-key-encoders-for-http-redacted-names.md": {
-      "fingerprint": "0ab056160a5cff85f8d8b15b345d7bf54c0dadfcfa91572a0c2039b427495aa6",
+      "fingerprint": "a82f1c099e05438214c94a691e4cdda1db8a01527c4c5b40a34c1019a2e0de02",
       "snapshot": {
-        ".changeset/require-key-encoders-for-http-redacted-names.md": "5c9b4ebb39543f494e456fdc2c6a74cafccf1bc4d3709ebeb5068d7a9b637053"
+        ".changeset/require-key-encoders-for-http-redacted-names.md": null
       },
-      "head": "9ed6190ffc3cc7236ec506b216443afaf288437e",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Added focused release changesets for #238; shipped skill guidance in skills/effect-api-query/references/http.md and _artifacts/skill_spec.md is already updated",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/require-key-encoders-for-http-redacted-names.md at 9ed6190ffc3cc7236ec506b216443afaf288437e"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/require-key-encoders-for-http-redacted-names.md."
       ]
     },
     "source:.changeset/preserve-as-no-content-values-in-contract-hydration.md": {
-      "fingerprint": "c865b3cee6b65a2bc2489405cd0e23a11d3ce007c66483562b28ce0fad74f018",
+      "fingerprint": "44e2f3a40c76947e9544bd3b24a713ca79e9d373371c66a91f83c7f4617de96a",
       "snapshot": {
-        ".changeset/preserve-as-no-content-values-in-contract-hydration.md": "a73e0d1fcf005924abdaeb7507563aab3084dd48318bde60c00f9f77c6d15ff6"
+        ".changeset/preserve-as-no-content-values-in-contract-hydration.md": null
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/preserve-as-no-content-values-in-contract-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-as-no-content-values-in-contract-hydration.md."
       ]
     },
     "source:.changeset/reject-nested-redacted-schemas-in-contract-hydration.md": {
-      "fingerprint": "455745093ef7b3e16aa2c4af9161c0cd8bb973c97b0aee4744605fd9cb7c5cbc",
+      "fingerprint": "ed676e36833087b92df767f42f6a9fa2937193038dba1848f68d122a039b4097",
       "snapshot": {
-        ".changeset/reject-nested-redacted-schemas-in-contract-hydration.md": "6737553ff6dc2e7dfc33268c35d13f8938c890bdc6a9faae9abc628a319d2892"
+        ".changeset/reject-nested-redacted-schemas-in-contract-hydration.md": null
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/reject-nested-redacted-schemas-in-contract-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reject-nested-redacted-schemas-in-contract-hydration.md."
       ]
     },
     "source:.changeset/require-header-allowlist-for-http-metadata-hydration.md": {
-      "fingerprint": "dceedb13d9f4635c9a12835caa7c2054304b247a77ae15db0cf4e388574de248",
+      "fingerprint": "e92043f79dc396c1841aa6abcb7eccc41a3688192fea009c468c1970acbd3343",
       "snapshot": {
-        ".changeset/require-header-allowlist-for-http-metadata-hydration.md": "3b8049e28602906f3b238b45e3004404567d04b031ea7f6b9b08b1ba5aaf3e99"
+        ".changeset/require-header-allowlist-for-http-metadata-hydration.md": null
       },
-      "head": "38d7d433661ed701518acda559d9bb1f0031c2cd",
-      "outcome": "updated",
-      "reason": "Updated skills/effect-api-query/references/hydration-and-ssr.md, apps/docs/src/content/docs/guides/hydrate-query-views.md, ADR 0058 (amending ADR 0047), and _artifacts/skill_spec.md for #239 contract-derived hydration hardening (nested Redacted detection, HttpApiSchema.asNoContent preservation, and opt-in explicit header allowlist for HTTP metadata hydration); verified with full vp test, vp run typecheck, vp run format, and vp run fallow",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Changed: .changeset/require-header-allowlist-for-http-metadata-hydration.md at 38d7d433661ed701518acda559d9bb1f0031c2cd"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/require-header-allowlist-for-http-metadata-hydration.md."
       ]
     },
     "source:docs/adr/0058-require-explicit-header-allowlist-for-metadata-hydration.md": {
@@ -4760,56 +4769,63 @@
       ]
     },
     "source:.changeset/preserve-http-metadata-snapshots.md": {
-      "fingerprint": "ac12c7e1dde08dea417a5e25785f77d37800264733d02adced4a0728b1119df7",
+      "fingerprint": "51695aadf6e12e761983bfaf3c6fa390296ee5953eeccec48dd107baf03ccf14",
       "snapshot": {
-        ".changeset/preserve-http-metadata-snapshots.md": "dada4aab8523e36a1a4e2f4dd679e9ca17b2bfe8d8fc8dea7ae78e038f8398f1"
+        ".changeset/preserve-http-metadata-snapshots.md": null
       },
-      "head": "21868ef8d808e5a4c07dbff91268ff24b6f27312",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "The patch changeset records the compatible fixes under ADR 0001. The release note requires no additional guidance or mapping.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/preserve-http-metadata-snapshots.md describes the two behaviors covered by tests/http-metadata-options.test.ts."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/preserve-http-metadata-snapshots.md."
       ]
     },
     "source:.changeset/screen-arrays-before-schema-sharing.md": {
-      "fingerprint": "1222cb09d38501abeed40db89198569ae39bd9f5376b19883c20abdeaa559b90",
+      "fingerprint": "f7bc2b70229099b1de1860543a8f834001a33320fab83320aa36b3926cf0fb0f",
       "snapshot": {
-        ".changeset/screen-arrays-before-schema-sharing.md": "d774ae3a9a29fd525eb0a8772fe0ff6e3d06c955bec873e3f19144e76f3d80c9"
+        ".changeset/screen-arrays-before-schema-sharing.md": null
       },
-      "head": "033bfddb8e0dcdc595fc7dad24aaf1f93a81f1cd",
-      "outcome": "out-of-scope",
-      "reason": "The patch changeset summarizes the compatible fix already covered by the sharing guide and cache-workflows reference.",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
+      "outcome": "no-change",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/screen-arrays-before-schema-sharing.md",
-        "docs/adr/0001-target-effect-4-release-candidate.md"
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/screen-arrays-before-schema-sharing.md."
       ]
     },
     "source:.changeset/clear-seeded-stream-reset.md": {
-      "fingerprint": "9c7977d1dc30fd3c21f74c13a65f44d8d3f89d9be4366874aa4402631fb49440",
+      "fingerprint": "ab5a3088a08cc7dfa23b8d7924f46a7732127767d895c3cc1502ffa477f268b9",
       "snapshot": {
-        ".changeset/clear-seeded-stream-reset.md": "63245ef60f390557d8dd0616fba5c1b7a587f26d70742f1d9e4fba52dac4e552"
+        ".changeset/clear-seeded-stream-reset.md": null
       },
-      "head": "bca2fed98b7bf479d16fcf01e95a339cd3722478",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "The patch changeset describes the same reset behavior as the updated query-patterns reference and needs no separate skill mapping.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        ".changeset/clear-seeded-stream-reset.md",
-        "skills/effect-api-query/references/query-patterns.md",
-        "ADR 0001 classifies compatible fixes as patches."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/clear-seeded-stream-reset.md."
       ]
     },
     "source:.changeset/isolate-generated-key-namespaces.md": {
-      "fingerprint": "5abfd85dd56b7834cc5b33b9bd8b22b14d225ff3af82d8a5288743ead5dc7ecc",
+      "fingerprint": "f959d325c46fed0433d8f714c1dea0b92d9fe5b409af2f781c89cdc39c06ad43",
       "snapshot": {
-        ".changeset/isolate-generated-key-namespaces.md": "7509dbb608476e9a400a580554252bf057c8b93e282dbc493dd1f66cdea43380"
+        ".changeset/isolate-generated-key-namespaces.md": null
       },
-      "head": "3c439384033513c706d76524e5a0a98985fbac0b",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "The minor changeset records the public tuple incompatibility under ADR 0001 and the reset guidance already included in the owning cache and hydration references.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "docs/adr/0059-version-and-isolate-generated-query-keys.md and .changeset/isolate-generated-key-namespaces.md at b483858",
-        "Public runtime, compiler, compatibility and format checks passed.",
-        "Revalidated the complete suite after incorporating main at 7aeff4e. The reviewed runtime and compiler fixtures are unchanged."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/isolate-generated-key-namespaces.md."
       ]
     },
     "source:scripts/lib/versioning-checkout.mts": {
@@ -4839,75 +4855,93 @@
       ]
     },
     "source:.changeset/cache-schema-structural-sharing-containers.md": {
-      "fingerprint": "fb34c26305482769db9b5e3fe437967d364c5c284ea11a435a834ab1ed36afc6",
+      "fingerprint": "53cf5fb05a20d6df92e6b947fb348fce768dffc00bb5abdbed1dd778443d301d",
       "snapshot": {
-        ".changeset/cache-schema-structural-sharing-containers.md": "c108d05fa61548cce2a17869c83e5344ae96b7d525a134bf69a86f563f762e71"
+        ".changeset/cache-schema-structural-sharing-containers.md": null
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/cache-schema-structural-sharing-containers.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/cache-schema-structural-sharing-containers.md."
       ]
     },
     "source:.changeset/improve-bundle-tree-shaking.md": {
-      "fingerprint": "b7e10126f8c8e0f5f3f6b7cc511726bc2f5f6fc359ce547a4d2133700965dad6",
+      "fingerprint": "e3dd8a37fe41a981a24b22fc63cca853e4422671840cdc131128f882e79a070b",
       "snapshot": {
-        ".changeset/improve-bundle-tree-shaking.md": "378d0212b7c425d01be326b5dd442234310ee1901274ed226adf0e0cb5bebdc1"
+        ".changeset/improve-bundle-tree-shaking.md": null
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/improve-bundle-tree-shaking.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/improve-bundle-tree-shaking.md."
       ]
     },
     "source:.changeset/reduce-type-checking-instantiations.md": {
-      "fingerprint": "90e5d26cbe31e427977d714f8afc7857c813fc3eef85db7217c7590cd77f485a",
+      "fingerprint": "bce8f04d48fb91a9c4225f69688697e5c2ed99aba1098fb4ce118072176a3426",
       "snapshot": {
-        ".changeset/reduce-type-checking-instantiations.md": "d126212e5491a1f5ef7b99a42b42b30a1e10edb3a3d95e9d2e3f35b5b6ff8aca"
+        ".changeset/reduce-type-checking-instantiations.md": null
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/reduce-type-checking-instantiations.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-type-checking-instantiations.md."
       ]
     },
     "source:.changeset/reduce-utility-tree-construction-overhead.md": {
-      "fingerprint": "ae731af0eae350823e79b36a7a3197631afeff1542bf054f49137d58791db858",
+      "fingerprint": "ace8291a7c892d1b4aed376fad1efab3bb8085334057d98fddf211a15c669807",
       "snapshot": {
-        ".changeset/reduce-utility-tree-construction-overhead.md": "255298401e033b46d1fc52753971f529ec1e02fc13b2836637ce9b20634cbc42"
+        ".changeset/reduce-utility-tree-construction-overhead.md": null
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/reduce-utility-tree-construction-overhead.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/reduce-utility-tree-construction-overhead.md."
       ]
     },
     "source:.changeset/single-pass-http-key-canonicalization.md": {
-      "fingerprint": "ced809bc7c688a0c74e0ea1e1e62d0e6e30436861341ae8fb6a6e56484b67dc8",
+      "fingerprint": "4ac890febb715fcc528fb62c17e8fc957471e2e975910ae78e907d049cce7940",
       "snapshot": {
-        ".changeset/single-pass-http-key-canonicalization.md": "93a9b0cf81b4d6b9b047e8650293d85bfd1a713295fdd71bd49fe163183ac0dc"
+        ".changeset/single-pass-http-key-canonicalization.md": null
       },
-      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/single-pass-http-key-canonicalization.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/single-pass-http-key-canonicalization.md."
       ]
     },
     "source:.changeset/poll-ready-stream-publication-pulls.md": {
-      "fingerprint": "45a0841d738e01f0b693c3d413067c7cce062367879a1de8ef90464925c6b734",
+      "fingerprint": "465bd313ae28370ef474ec9a742aa5c7dc1cf9c087fc5d03e0d07984bb2c9133",
       "snapshot": {
-        ".changeset/poll-ready-stream-publication-pulls.md": "9f58cf32e52dbcd500e25ff2b15853790aca9b1fb35280110cddeeef5f62867e"
+        ".changeset/poll-ready-stream-publication-pulls.md": null
       },
-      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
+      "head": "e24eacbfdab1501f60af8d6380c8422823f9eb4e",
       "outcome": "no-change",
-      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "reason": "Changesets generated this release changelog or consumed its release notes; the reviewed implementation and consumer guidance are unchanged.",
       "evidence": [
-        "Reviewed .changeset/poll-ready-stream-publication-pulls.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+        "Before versioning: intent maintainer check passed at e24eacbfdab1501f60af8d6380c8422823f9eb4e.",
+        "changeset version and vp fmt generated 0.8.0 -> 0.9.0.",
+        "Verified that all manifest fields except version and all existing changelog entries are unchanged; other generated changes are only consumed .changeset/*.md deletions.",
+        "Scoped generated changes: .changeset/poll-ready-stream-publication-pulls.md."
       ]
     },
     "source:.deepsec/.gitignore": {
