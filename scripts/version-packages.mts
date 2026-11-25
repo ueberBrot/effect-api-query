@@ -76,9 +76,13 @@ await withVersioningCheckout(async (checkout) => {
       !/^ mode change /mu.test(git("diff", "--summary", base)),
       "Versioning changed file modes."
     );
+
+    const untracked = git("ls-files", "--others", "--exclude-standard", "-z")
+      .split("\0")
+      .filter(Boolean);
     ok(
-      !git("ls-files", "--others", "--exclude-standard").trim(),
-      "Versioning created unexpected untracked files."
+      untracked.length === 0,
+      `Versioning created unexpected untracked files: ${untracked.join(", ")}.`
     );
   };
   runCommand("vp", ["exec", "changeset", "version"], {

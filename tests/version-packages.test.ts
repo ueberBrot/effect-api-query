@@ -4,8 +4,10 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
+  readdirSync,
   readFileSync,
   rmSync,
+  statSync,
   symlinkSync,
   writeFileSync,
 } from "node:fs";
@@ -599,6 +601,88 @@ export default {
       );
       expect(result.status).toBe(1);
       expect(result.stdout).toContain("changed src/index.ts");
+    });
+  }, 30_000);
+
+  it("ignores temporary node_modules links when .gitignore uses a trailing slash", () => {
+    withCheckout((cwd) => {
+      const nodeModules = nodePath.join(cwd, "node_modules");
+      rmSync(nodeModules, { force: true });
+      mkdirSync(nodeModules);
+      const sourceModules = nodePath.join(repository, "node_modules");
+      for (const entry of readdirSync(sourceModules)) {
+        const sourceEntry = nodePath.join(sourceModules, entry);
+        symlinkSync(
+          sourceEntry,
+          nodePath.join(nodeModules, entry),
+          statSync(sourceEntry, { throwIfNoEntry: false })?.isDirectory() ===
+            true
+            ? "junction"
+            : "file"
+        );
+      }
+
+      write(cwd, ".gitignore", "node_modules/\n.vite/\n");
+      commit(cwd);
+      intent(
+        cwd,
+        "review",
+        "--unchanged",
+        "Trailing-slash .gitignore matches repository layout; consumer guidance is unchanged."
+      );
+      run(cwd, "vp", ["fmt", ".intent/review-state.json"]);
+      commit(cwd);
+
+      const result = version(cwd);
+      expect(result.status).toBe(0);
+      expect(JSON.parse(read(cwd, "package.json"))).toMatchObject({
+        version: "0.2.0",
+      });
+      expect(intent(cwd, "check")).toContain("0 pending review item(s)");
+    });
+  }, 30_000);
+
+  it("rejects unexpected untracked files created during versioning", () => {
+    withCheckout((cwd) => {
+      write(
+        cwd,
+        ".changeset/config.json",
+        JSON.stringify({
+          baseBranch: "main",
+          changelog: ["./changelog.mjs", {}],
+        })
+      );
+      write(
+        cwd,
+        ".changeset/changelog.mjs",
+        `
+import { writeFileSync } from "node:fs";
+export default {
+  getReleaseLine() {
+    writeFileSync("unexpected-release-artifact.txt", "stale\\n");
+    return "Generated fixture release.";
+  },
+  getDependencyReleaseLine() { return ""; },
+};
+`
+      );
+      run(cwd, "vp", ["fmt"]);
+      commit(cwd);
+      intent(
+        cwd,
+        "review",
+        "--unchanged",
+        "The fixture changelog creates an untracked file to test the release guard; consumer guidance is unchanged."
+      );
+      run(cwd, "vp", ["fmt", ".intent/review-state.json"]);
+      commit(cwd);
+
+      const result = version(cwd);
+      expect(result.status).not.toBe(0);
+      expect(result.stderr).toContain(
+        "Versioning created unexpected untracked files: unexpected-release-artifact.txt."
+      );
+      expect(git(cwd, "status", "--porcelain")).toBe("");
     });
   }, 30_000);
 });
