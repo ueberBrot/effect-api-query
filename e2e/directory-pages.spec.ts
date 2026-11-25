@@ -17,7 +17,7 @@ for (const exampleHost of ["start", "standalone"] as const) {
       page,
       writeToken,
     }) => {
-      const extraUsers = directoryLimits.previewSize - 12 + 1;
+      const extraUsers = directoryLimits.previewSize - 12 + 2;
       const lastName = `Additional user ${String(extraUsers)}`;
       for (let index = 1; index <= extraUsers; index += 1) {
         // oxlint-disable-next-line eslint/no-await-in-loop
@@ -46,7 +46,7 @@ for (const exampleHost of ["start", "standalone"] as const) {
       }
       await expect(page.getByText("16 users in one response")).toBeVisible();
       await expect(
-        page.getByText("4 of 17 loaded", { exact: true })
+        page.getByText("4 of 18 loaded", { exact: true })
       ).toBeVisible();
       await page
         .getByRole("button", { name: "Read cached directory", exact: true })
@@ -61,13 +61,13 @@ for (const exampleHost of ["start", "standalone"] as const) {
       for (const loaded of [8, 12, 16]) {
         await page.getByRole("button", { name: "Load next 4 users" }).click();
         await expect(
-          page.getByText(`${String(loaded)} of 17 loaded`, { exact: true })
+          page.getByText(`${String(loaded)} of 18 loaded`, { exact: true })
         ).toBeVisible();
       }
       /* oxlint-enable eslint/no-await-in-loop */
-      await page.getByRole("button", { name: "Load next 1 users" }).click();
+      await page.getByRole("button", { name: "Load next 2 users" }).click();
       await expect(
-        page.getByText(`#17 ${lastName}`, { exact: true })
+        page.getByText(`#18 ${lastName}`, { exact: true })
       ).toBeVisible();
 
       if (exampleHost === "start") {
@@ -83,7 +83,7 @@ for (const exampleHost of ["start", "standalone"] as const) {
       await expect(
         page.getByText("HTTP cached directory: 16 users")
       ).toBeVisible();
-      await expect(page.getByText("HTTP: 4 of 17 loaded")).toBeVisible();
+      await expect(page.getByText("HTTP: 4 of 18 loaded")).toBeVisible();
       if (exampleHost === "start") {
         expect(requests).toEqual([]);
       } else {
@@ -93,10 +93,10 @@ for (const exampleHost of ["start", "standalone"] as const) {
       }
       await enableDemoWrites(page, writeToken);
       /* oxlint-disable eslint/no-await-in-loop */
-      for (const loaded of [8, 12, 16, 17]) {
+      for (const loaded of [8, 12, 16, 18]) {
         await page.getByRole("button", { name: "Load next HTTP page" }).click();
         await expect(
-          page.getByText(`HTTP: ${String(loaded)} of 17 loaded`)
+          page.getByText(`HTTP: ${String(loaded)} of 18 loaded`)
         ).toBeVisible();
       }
       /* oxlint-enable eslint/no-await-in-loop */
@@ -106,7 +106,7 @@ for (const exampleHost of ["start", "standalone"] as const) {
       await expect(httpDelete).toBeVisible();
       const deletion = page.waitForResponse((response) =>
         exampleHost === "start"
-          ? isHttpRequest(response.request(), "DELETE", "/users/17")
+          ? isHttpRequest(response.request(), "DELETE", "/users/18")
           : recordsRpc(response.request().postData(), "users.delete")
       );
       await (
@@ -118,11 +118,28 @@ for (const exampleHost of ["start", "standalone"] as const) {
             })
       ).click();
       const deleted = await deletion;
-      const missing = await page.request.get(`${exampleUrl}/api/users/17`);
+      const missing = await page.request.get(`${exampleUrl}/api/users/18`);
       expect(deleted.ok()).toBe(true);
       expect(missing.status()).toBe(404);
-      await expect(page.getByText("HTTP: 16 of 16 loaded")).toBeVisible();
+      await expect(page.getByText("HTTP: 17 of 17 loaded")).toBeVisible();
       await expect(page.getByText(lastName, { exact: false })).toHaveCount(0);
+      if (exampleHost === "standalone") {
+        const httpDeletion = page.waitForResponse((response) =>
+          isHttpRequest(response.request(), "DELETE", "/users/17")
+        );
+        await page
+          .getByRole("button", {
+            name: `Delete HTTP Additional user ${String(extraUsers - 1)}`,
+          })
+          .click();
+        const httpDeleted = await httpDeletion;
+        const httpMissing = await page.request.get(
+          `${exampleUrl}/api/users/17`
+        );
+        expect(httpDeleted.ok()).toBe(true);
+        expect(httpMissing.status()).toBe(404);
+        await expect(page.getByText("HTTP: 16 of 16 loaded")).toBeVisible();
+      }
     });
   });
 }
