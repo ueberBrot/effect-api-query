@@ -4,7 +4,9 @@ import { createHash } from "node:crypto";
 import { once } from "node:events";
 import {
   lstatSync,
+  mkdirSync,
   mkdtempSync,
+  readdirSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -42,6 +44,18 @@ const digestGeneratedPatch = async (
     `git diff failed (${child.signalCode ?? `exit ${child.exitCode}`}).`
   );
   return hash.digest("hex");
+};
+
+const linkNodeModules = (sourceDir: string, targetDir: string) => {
+  mkdirSync(targetDir);
+  for (const entry of readdirSync(sourceDir)) {
+    const sourceEntry = nodePath.join(sourceDir, entry);
+    const type =
+      statSync(sourceEntry, { throwIfNoEntry: false })?.isDirectory() === true
+        ? "junction"
+        : "file";
+    symlinkSync(sourceEntry, nodePath.join(targetDir, entry), type);
+  }
 };
 
 export const withVersioningCheckout = async (
@@ -93,12 +107,9 @@ export const withVersioningCheckout = async (
       worktree,
       base
     );
+    const linkedNodeModules = nodePath.join(worktree, "node_modules");
     try {
-      symlinkSync(
-        nodePath.join(cwd, "node_modules"),
-        nodePath.join(worktree, "node_modules"),
-        "junction"
-      );
+      linkNodeModules(nodePath.join(cwd, "node_modules"), linkedNodeModules);
       await generate({
         base,
         options,
@@ -107,6 +118,7 @@ export const withVersioningCheckout = async (
       });
       capture("git", [...diff, `--output=${patch}`, base, "--", "."], options);
     } finally {
+      rmSync(linkedNodeModules, { recursive: true, force: true });
       git("worktree", "remove", "--force", worktree);
     }
 
