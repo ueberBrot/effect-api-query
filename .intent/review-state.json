@@ -3695,15 +3695,17 @@
       ]
     },
     "source:.github/workflows/playwright.yml": {
-      "fingerprint": "1c08fbae859924e7f5337f3623f0babeb0b2a44bc50260b29fb26d794dba8ec2",
+      "fingerprint": "2ae76eaa8fcdb4d07780393718027fd3a58ffdb6964e3c6c7d921988167cc2af",
       "snapshot": {
-        ".github/workflows/playwright.yml": "fcfe953490a88a9175138c6f01f184d5692f64827aa44c086d212391aafdd671"
+        ".github/workflows/playwright.yml": "895e3d5e4d54950c6b103dfba399614a0d384c8c6a4819fcb1385de54c7d41d7"
       },
-      "head": "ce8bf1105e0830f7de5d90800015c6662e8eaae9",
+      "head": "66ea7cb1581abf9a9e5d8834d69d47efba921d57",
       "outcome": "out-of-scope",
-      "reason": "Removed repository-only static docs Playwright suite and its CI/task wiring; published library API and shipped skill usage guidance are unchanged.",
+      "reason": "The reusable workflow changes WebKit CI worker scheduling only. Consumer behavior and shipped guidance are unaffected.",
       "evidence": [
-        "vp test (docs-release, docs-examples, workflow-guards), vp run check, vp run fallow, and vp run skills-check."
+        "Both WebKit shards passed locally with two workers (34 and 29 tests).",
+        "Playwright listed identical test IDs and file-level shard membership for all six CI jobs. Chromium, Firefox, and local runs use one worker.",
+        "Repository workflow check and 20 workflow guard tests passed."
       ]
     },
     "source:.changeset/steady-query-streams.md": {

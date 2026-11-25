@@ -77,7 +77,10 @@ jobs:
         env:
           BROWSER: ${{ matrix.browser }}
           SHARD: ${{ matrix.shard }}
-        run: vp run --ignore-depends-on "e2e:$BROWSER" --shard="$SHARD"
+          WORKERS: ${{ matrix.browser == 'webkit' && 2 || 1 }}
+        run: |
+          vp run --ignore-depends-on "e2e:$BROWSER" \
+            --shard="$SHARD" --workers="$WORKERS"
 
       - name: Preserve Playwright failure diagnostics
         if: failure()
