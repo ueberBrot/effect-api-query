@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 import { QueryClient, QueryObserver } from "@tanstack/query-core";
-import { Deferred, Effect, Exit, Fiber, Schema, Scope, Stream } from "effect";
+import { Deferred, Effect, Schema, Stream } from "effect";
 import { HttpClient, HttpClientResponse } from "effect/http";
 import {
   HttpApi,
@@ -16,7 +16,6 @@ import {
   createHttpApiQueryUtils,
   createRpcQueryUtils,
 } from "#effect-api-query";
-import { streamPublicationBatches } from "#effect-api-query/core/stream-publication";
 
 import { captureFailure } from "./fixtures/async";
 import { makeRpcTestClient } from "./fixtures/effect-rpc";
@@ -400,33 +399,5 @@ it.effect(
         stop();
         queryClient.clear();
       }
-    })
-);
-
-it.effect(
-  "interrupts an in-flight no-deadline publication pull when its scope closes",
-  () =>
-    Effect.gen(function* interruptsPullOnScopeClose() {
-      const entered = yield* Deferred.make<undefined>();
-      const source: Stream.Stream<number> = Stream.fromEffect(
-        Effect.gen(function* blockOnSource() {
-          yield* Deferred.succeed(entered, undefined);
-          return yield* Effect.never;
-        })
-      );
-
-      const scope = yield* Scope.make();
-      const pull = yield* Stream.toPull(
-        streamPublicationBatches(source, 2)
-      ).pipe(Effect.provideService(Scope.Scope, scope));
-
-      const pullFiber = yield* Effect.forkChild(pull, {
-        startImmediately: true,
-      });
-      yield* Deferred.await(entered);
-      yield* Scope.close(scope, Exit.void);
-
-      const exit = yield* Fiber.await(pullFiber);
-      expect(Exit.isFailure(exit)).toBe(true);
     })
 );

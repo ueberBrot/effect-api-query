@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "bf0ddaa37ff2be011547202f8549b84f7e1298d42b55898efce3ce6281ad6b8c",
+      "fingerprint": "01de5969476a00d02c738f9334912791bf12c1750c11e9c0b5083ecd613f0c44",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -368,7 +368,8 @@
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "7e2a34b29d5a51c5d004bfe0fbc02f6007015f0d9a069f01ba06667894bcd08d",
+        "tests/stream-publication-scope.test.ts": "7c75e5a0353af3d617e8aa6ded70efd84fabcd187ab348d434c8b3545759f75b",
+        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "fe5415c2545424c3ad88126cdb51a4219f04beb80ba69f15b905bed6ffb8b96b",
@@ -444,15 +445,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "5df070566686e6e177ba5b1a2ce61c0f032693ac",
+      "head": "ffce09437943b241df2f0a34ff2105258e8c4185",
       "outcome": "no-change",
-      "reason": "Preserve inherited HTTP request-part lookup in cached single-property struct encoding without changing public API or guidance.",
+      "reason": "Moved internal stream-publication scope test out of the packed-consumer public test file without changing public API or guidance.",
       "evidence": [
-        "vp check, fallow, and tests/http-semantic-keys.test.ts (including inherited query regression) pass."
+        "vp check, fallow, tests/stream-publication.test.ts, and tests/stream-publication-scope.test.ts pass."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "33185dc12eef0111b2dcc2e5f258e4605831b0d202cb56daa602f13b61373f78",
+      "fingerprint": "56dc997f3ff97d66015c1624ee8e61fe159e1cdce2dbec6c21e7a57d94f60a19",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -820,7 +821,8 @@
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "7e2a34b29d5a51c5d004bfe0fbc02f6007015f0d9a069f01ba06667894bcd08d",
+        "tests/stream-publication-scope.test.ts": "7c75e5a0353af3d617e8aa6ded70efd84fabcd187ab348d434c8b3545759f75b",
+        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "fe5415c2545424c3ad88126cdb51a4219f04beb80ba69f15b905bed6ffb8b96b",
@@ -896,11 +898,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "5df070566686e6e177ba5b1a2ce61c0f032693ac",
+      "head": "ffce09437943b241df2f0a34ff2105258e8c4185",
       "outcome": "no-change",
-      "reason": "Domain boundaries and skill tree coverage remain unchanged by the inherited-property lookup fix.",
+      "reason": "Moved internal stream-publication scope test out of the packed-consumer public test file without changing public API or guidance.",
       "evidence": [
-        "Internal change limited to src/http/request.ts and tests/http-semantic-keys.test.ts."
+        "vp check, fallow, tests/stream-publication.test.ts, and tests/stream-publication-scope.test.ts pass."
       ]
     },
     "source:vite.config.ts": {
