@@ -36,7 +36,43 @@ export type HttpRequestDescription = (
 ) & { readonly parts: readonly string[] };
 
 const requestParts = ["params", "query", "headers", "payload"] as const;
-type RequestFields = Partial<Record<(typeof requestParts)[number], Schema.Top>>;
+type RequestPart = (typeof requestParts)[number];
+type RequestFields = Partial<Record<RequestPart, Schema.Top>>;
+
+const partEncodings: Record<
+  RequestPart,
+  WeakMap<Schema.Top, SchemaKeyEncoding>
+> = {
+  params: new WeakMap(),
+  query: new WeakMap(),
+  headers: new WeakMap(),
+  payload: new WeakMap(),
+};
+
+const getPartKeyEncoding = (
+  part: RequestPart,
+  schema: Schema.Top,
+  options: SchemaAST.ParseOptions | undefined
+): SchemaKeyEncoding => {
+  if (options !== undefined) {
+    return createSchemaKeyEncoding(Schema.Struct({ [part]: schema }), options);
+  }
+
+  const cache = partEncodings[part];
+  const cached = cache.get(schema);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const encoding = createSchemaKeyEncoding(
+    Schema.Struct({ [part]: schema }),
+    undefined
+  );
+  if (encoding.cacheable) {
+    cache.set(schema, encoding);
+  }
+  return encoding;
+};
 type RedactionAnalysis = "Safe" | "RequiresEncoder" | "Retry";
 
 interface EndpointRedactedNames {
@@ -261,14 +297,16 @@ const requestKeyEncoding = (
   });
   const encoders = parts.map(
     ({ part, schema, options }) =>
-      [part, createSchemaKeyEncoding(schema, options)] as const
+      [part, getPartKeyEncoding(part, schema, options)] as const
   );
+
   const requiresEncoder =
     encoders.some(([, encoding]) => encoding.requiresEncoder) ||
     redactedAnalysis !== "Safe";
   const cacheable =
     encoders.every(([, encoding]) => encoding.cacheable) &&
     redactedAnalysis !== "Retry";
+
   return {
     requiresEncoder,
     cacheable,
@@ -276,10 +314,20 @@ const requestKeyEncoding = (
       if (!Predicate.isObject(input)) {
         throw new TypeError("HTTP request input must be an object");
       }
+
       // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
       const encoded: Record<string, unknown> = {};
       for (const [part, encoding] of encoders) {
-        encoded[part] = encoding.encode(input[part]);
+        const partInput = Object.hasOwn(input, part)
+          ? { [part]: input[part] }
+          : {};
+        const partEncoded = encoding.encode(partInput);
+        if (
+          Predicate.isObject(partEncoded) &&
+          Object.hasOwn(partEncoded, part)
+        ) {
+          encoded[part] = partEncoded[part];
+        }
       }
       return encoded;
     },
@@ -457,14 +505,12 @@ const normalizeHeaders = (
   seen.add(rawHeaders);
 
   const prototype: unknown = Object.getPrototypeOf(rawHeaders);
-  if (prototype !== Object.prototype && prototype !== null) {
-    throw new TypeError("Key values must contain only plain objects");
-  }
-
+  const plain = prototype === Object.prototype || prototype === null;
   const lowered = new Map<string, JsonValue>();
+
   for (const name of Object.keys(rawHeaders)) {
     const headerValue = rawHeaders[name];
-    if (headerValue === undefined) {
+    if (plain && headerValue === undefined) {
       continue;
     }
     if (matchesHeaderRedaction(name, redactedPatterns)) {
@@ -478,7 +524,9 @@ const normalizeHeaders = (
       );
     }
 
-    const canonicalValue = canonicalizeOmittingUndefined(headerValue, seen);
+    const canonicalValue = plain
+      ? canonicalizeOmittingUndefined(headerValue, seen)
+      : canonicalize(headerValue, seen);
     const existing = lowered.get(lower);
     if (existing !== undefined && !Equal.equals(existing, canonicalValue)) {
       throw new TypeError(

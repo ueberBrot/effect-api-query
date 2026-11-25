@@ -1,5 +1,5 @@
 import type { DataTag, QueryKey } from "@tanstack/query-core";
-import type { Context, Effect, Schema, SchemaAST, Stream } from "effect";
+import type { Context, Effect, Schema, SchemaAST, Stream, Types } from "effect";
 import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
@@ -550,8 +550,8 @@ export type FlatMethodError<Client, Tag extends string> = Client extends (
 export type ExtractRpcClientError<Group extends RpcGroup.Any, Client> =
   Client extends RpcClient.RpcClient.Flat<RpcsOf<Group>, infer E>
     ? E
-    : Client extends RpcClient.RpcClient<RpcsOf<Group>, infer E>
-      ? E
+    : Types.Equals<Client, RpcClient.RpcClient<RpcsOf<Group>>> extends true
+      ? never
       : RpcsOf<Group> extends infer R
         ? R extends Rpc.Any
           ? Exclude<

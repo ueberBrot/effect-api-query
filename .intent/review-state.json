@@ -3,7 +3,7 @@
   "baseline": "5b91ddb1de13970365669c887b9d767ea417fbd4",
   "items": {
     "skill:skills/effect-api-query/SKILL.md": {
-      "fingerprint": "67561376ef8e2681e12e7ec1701be2aae3d2e02bc182aa700c9eb796046ebfc1",
+      "fingerprint": "3b5ae5f0507070cfebf952273a7757c009770a349686d0028a314e6df6493257",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -268,9 +268,9 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "5a7947ca797ddef275520600016417c7e99ed0c22920ef63df592b0a153c28ea",
+        "src/core/schema-structural-sharing.ts": "52d553e3c9c16d4bd6d868eb9469a4deb3d7e95643216932b3602ddc4dced70a",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "c7f58140543bb3501751220dc7214f0d36de52ec53e35c897c7d9ec76aef6f66",
+        "src/core/stream-publication.ts": "7d7d16c231cf638a707a953ac16ddc0f7843656c58e3e698ed01464da6e4d453",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
@@ -285,7 +285,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "6d3c0c0486795cd1e97dab87998acd74ce5c69196371573cb837fc10e23056ff",
-        "src/http/request.ts": "7b7fbfaa7d7ebd4512aaedab413a74294ccbdebe83f2d46507e8b4fb92f3ae22",
+        "src/http/request.ts": "6cf4770c0246c93a4c562fa2ee3a059e0b86c2fca95a95401dd44fc4a46e672e",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "9d442530d02d92a04589124f63de0750fb01c2e7874eff8150ce445616dbb3c1",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
@@ -294,7 +294,7 @@
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
         "src/rpc/operation.ts": "0dc2167670a4d99500be536d660cc49488d651a1376f75522aea5d4ad7f778dd",
         "src/rpc/streamed-query.ts": "fd943d0d6de22f3458cb1373dbae346890d15865597357bacb13a9085ab3652b",
-        "src/rpc/types.ts": "38f108e1828c29000d3f8be078c520645d0c54aeda690d4ec246585b665cb2a0",
+        "src/rpc/types.ts": "85d880c4bf382b7c6adfb6696148d733a22859cc499820f68102ae48d35d103f",
         "tests/cache-recipes.test.ts": "13d7bbe50388f15093391a983bbcb6135bb6ec1e61129f0d7d4c623c3f807751",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
         "tests/contract-hydration.test.ts": "cf6bf19d1ecb2b8c20773188f4f8b7871db90d1e4d9c595ce4f5fb620e84ba9a",
@@ -342,7 +342,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "b612179bf892c102c7d5157e035d5a9c004fbcd42f1831f7e805ab68eb6a72b9",
-        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
+        "tests/http-semantic-keys.test.ts": "be58aac982258c3033958d6c44578db9fc0b0a4380e5250362cd4353705f37d1",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "a3a0333df4f8a5ceb5fe0148d45d756474886564e65bb07ad5555a0b34f5b6fa",
@@ -363,12 +363,12 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
+        "tests/schema-structural-sharing.test.ts": "ac1aa71026c5d0b9899359dc93fcdec83b7c48f8762a94f536fb9f4a8ea0a842",
         "tests/skills-maintenance.test.ts": "5a5e82797f3dba7cefa6d0d7ffceab8f2bb82c407ff10763c2f95794357527fc",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
+        "tests/stream-publication.test.ts": "7e2a34b29d5a51c5d004bfe0fbc02f6007015f0d9a069f01ba06667894bcd08d",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "fe5415c2545424c3ad88126cdb51a4219f04beb80ba69f15b905bed6ffb8b96b",
@@ -428,7 +428,7 @@
         "tests/types/react-queries-contract.tsx": "a513596274aa5edfe51c8b2e2c603f80fc6550d58e3b523550569ef292112ba0",
         "tests/types/react-subpath-contract.tsx": "795221e7f27234de9e949d096e373af768ff5154190be99c2cb1815f86b8d313",
         "tests/types/reactivity-invalidation-contract.ts": "ffefc4616971161595a8a231f2b3facc0d7872657c71fec044109a30b3c2b3bd",
-        "tests/types/rpc-cast-contract.ts": "28e5b213d6039673a9f497c2b83b31023f4d831745236f5867fb2c519e0377c0",
+        "tests/types/rpc-cast-contract.ts": "2975129f3d1ad6bb5c7f0359b77f2482b0701c20fdb31573c8e5bbfda9741f6e",
         "tests/types/rpc-large-contract.ts": "90a187196bddaa97474c4a18b36a126f24b698e420677c5bde816e37283b1c96",
         "tests/types/server-local-client-contract.ts": "582a121efab98c6c52d371b6f07c3e0c42c07cbb60f0d70f357f24262d677f99",
         "tests/types/setup-overhaul-contract.ts": "a2e5b9845c1686e25f4da8380a3a0479d05b4962533d768f0175c8fa156ef99f",
@@ -444,15 +444,15 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
       "outcome": "no-change",
-      "reason": "Internal type-checker, runtime, and tree-shaking performance optimizations preserve all public API contracts and usage guidance.",
+      "reason": "Internal type-checker, runtime, and tree-shaking performance optimizations and regression tests preserve all public API contracts and usage guidance.",
       "evidence": [
-        "vp check, fallow, api-types, server-local-types, framework-types, tightened measure-types budgets, and 86/86 test files (1,110 tests) pass without public API or usage changes."
+        "vp check, fallow, api-types, server-local-types, framework-types, tightened type budgets, and regression tests pass without public API or usage changes."
       ]
     },
     "planning:_artifacts": {
-      "fingerprint": "23640e632aeed444754785f909758292c3c13ea613997af7a310da0acce13ab5",
+      "fingerprint": "47b9853a3d6d123fcbbc760a1e0d5dbcb938ceb72ba20262ed506addcfd05168",
       "snapshot": {
         "GLOSSARY.md": "7fa3de9ce2b21e39ad33af675cc200077db85b9a4ae8c15fc9ff63c9d44e1d97",
         "README.md": "0e5abf47f887c392146c7c2659a789a08d003033c4b136d99e5534dcc6e5ca9e",
@@ -720,9 +720,9 @@
         "src/core/reactivity-invalidation.ts": "0f8465628e341e00cca4b65ea19ac75d6cfe1f344da092e4e89ec4dabda6976a",
         "src/core/runtime.ts": "9e99f2a078a1058b3b6b01ada7585d3f63d3486b397be3a6e1f08f0d3f0a9fad",
         "src/core/schema-key.ts": "0d6c00371526085fe19689a7401dfd86cb6f6a96f6b351b4b31bb2648804d5df",
-        "src/core/schema-structural-sharing.ts": "5a7947ca797ddef275520600016417c7e99ed0c22920ef63df592b0a153c28ea",
+        "src/core/schema-structural-sharing.ts": "52d553e3c9c16d4bd6d868eb9469a4deb3d7e95643216932b3602ddc4dced70a",
         "src/core/stream-hash-index.ts": "bd9b6ec1abb552f0e6373881f94acaf3a390aab0d22717f383ef7f4209dc23a5",
-        "src/core/stream-publication.ts": "c7f58140543bb3501751220dc7214f0d36de52ec53e35c897c7d9ec76aef6f66",
+        "src/core/stream-publication.ts": "7d7d16c231cf638a707a953ac16ddc0f7843656c58e3e698ed01464da6e4d453",
         "src/core/stream-pull.ts": "9b7957b4487ddcdce2183f55c6f08e6cddee011c5d5e5b8c7b72ec839a7e3c42",
         "src/core/stream-recovery.ts": "3e18902069a6388e23668ca7639d1c4308f98ce097c23daf4d12b562c0e9c664",
         "src/core/stream-snapshot.ts": "0e2fc754d8b19065f577a152f64f5b35c5429ac196662b2db8534eb33c3cb037",
@@ -737,7 +737,7 @@
         "src/http/endpoint.ts": "06670d2d3f13f14c0faa0aaa8774a133baa99c63819e97f2b5501ef2ee175900",
         "src/http/errors.ts": "bcda0ae353816a1f31001839ee7c7d51270c307be7380a0263b06c1b98276f36",
         "src/http/operation.ts": "6d3c0c0486795cd1e97dab87998acd74ce5c69196371573cb837fc10e23056ff",
-        "src/http/request.ts": "7b7fbfaa7d7ebd4512aaedab413a74294ccbdebe83f2d46507e8b4fb92f3ae22",
+        "src/http/request.ts": "6cf4770c0246c93a4c562fa2ee3a059e0b86c2fca95a95401dd44fc4a46e672e",
         "src/http/streamed-query.ts": "fac8ba0fd1ff7059295d9fab0237ac86f5b75673bb6d5776ada5f44c6e9d0c44",
         "src/http/types.ts": "9d442530d02d92a04589124f63de0750fb01c2e7874eff8150ce445616dbb3c1",
         "src/index.ts": "4313984f8f12065eda67ccb39ef24c3876e636d34cf0d1048d7fa9f309aa1a3e",
@@ -746,7 +746,7 @@
         "src/rpc/errors.ts": "ece32d573b0a5e7db1104bcf3f902262a94b89a59de82d50042d21016147e50d",
         "src/rpc/operation.ts": "0dc2167670a4d99500be536d660cc49488d651a1376f75522aea5d4ad7f778dd",
         "src/rpc/streamed-query.ts": "fd943d0d6de22f3458cb1373dbae346890d15865597357bacb13a9085ab3652b",
-        "src/rpc/types.ts": "38f108e1828c29000d3f8be078c520645d0c54aeda690d4ec246585b665cb2a0",
+        "src/rpc/types.ts": "85d880c4bf382b7c6adfb6696148d733a22859cc499820f68102ae48d35d103f",
         "tests/cache-recipes.test.ts": "13d7bbe50388f15093391a983bbcb6135bb6ec1e61129f0d7d4c623c3f807751",
         "tests/configuration-composition.test.ts": "be2ffca6e62965d8b79a311998787f74565d4af86bcaec46c36f5a963b0d16f5",
         "tests/contract-hydration.test.ts": "cf6bf19d1ecb2b8c20773188f4f8b7871db90d1e4d9c595ce4f5fb620e84ba9a",
@@ -794,7 +794,7 @@
         "tests/http-multipart.test.ts": "1e9aabe7401e6e0baac20c58d86b87c371dde43dd2049ec5f343968ad5254005",
         "tests/http-ndjson-query.test.ts": "5f722d8bcaaff9a6f4b5413ec393d14dfce6d282646f20377eec504cdd4663f8",
         "tests/http-query-options.test.ts": "b612179bf892c102c7d5157e035d5a9c004fbcd42f1831f7e805ab68eb6a72b9",
-        "tests/http-semantic-keys.test.ts": "2d6d9f1a675e42f15a2a26c3616a911a37bbef90b6e516cda3a81bff45e1f9bf",
+        "tests/http-semantic-keys.test.ts": "be58aac982258c3033958d6c44578db9fc0b0a4380e5250362cd4353705f37d1",
         "tests/http-structural-sharing.test.ts": "7cb0dbe6359b567a9ab3eeb550ecfa45855845d93be53baa1d4a1caf20ee8977",
         "tests/http-transport-cancellation.test.ts": "b3dc08d09bfad3c33d257369ae087311b53a341e7031cf5213915b69404774d3",
         "tests/hydration-codecs.test.ts": "a3a0333df4f8a5ceb5fe0148d45d756474886564e65bb07ad5555a0b34f5b6fa",
@@ -815,12 +815,12 @@
         "tests/react.test.tsx": "a5494e54ab73dc73a30c4a1e0d51634ad9772735195295e1f65cc9274531b554",
         "tests/reactivity-invalidation.test.ts": "4e4c02e42b62a0e0cdadf058051ac1074f7cc430675569e40c31e4537ed9694d",
         "tests/schema-sharing-prototypes.test.ts": "628a6622656b9b53e686d14b9efbd3abc13c61a13db1546001b0689b491f6022",
-        "tests/schema-structural-sharing.test.ts": "e92f9f428804339a99d7ff4c6fc40a9696d953eeccb1176f6b3758a33412eb2d",
+        "tests/schema-structural-sharing.test.ts": "ac1aa71026c5d0b9899359dc93fcdec83b7c48f8762a94f536fb9f4a8ea0a842",
         "tests/skills-maintenance.test.ts": "5a5e82797f3dba7cefa6d0d7ffceab8f2bb82c407ff10763c2f95794357527fc",
         "tests/skills/query-usability/fixture.ts": "71b95139b6382afb86f48aeab87a57e00cbf1c1ab3d33b9329761d466ebe4436",
         "tests/skills/query-usability/grade.test.ts": "b4ce4b395a7f38bdc788f3d3268e0236bbe5827b153df9c0592165f0d81817cd",
         "tests/skills/query-usability/solution.ts": "3aa6797a7fb4a45c02ea1a48697c7dc8d055b762e80663ddcf4d761e8b9a0863",
-        "tests/stream-publication.test.ts": "7b48383872f678984bf72f0a684bb6c3ef57b5d64ba08ff47c32dddc88f1e15b",
+        "tests/stream-publication.test.ts": "7e2a34b29d5a51c5d004bfe0fbc02f6007015f0d9a069f01ba06667894bcd08d",
         "tests/stream-recovery.test.ts": "41f795edb52eb21601efee459477256ae47408a344a7106d7246e640379e0376",
         "tests/stream-snapshot.test.ts": "497a414206d844608d49cee4db98cc97764b92a36efb5f019255ef8b4a38ee9c",
         "tests/types/application-policy-contract.ts": "fe5415c2545424c3ad88126cdb51a4219f04beb80ba69f15b905bed6ffb8b96b",
@@ -880,7 +880,7 @@
         "tests/types/react-queries-contract.tsx": "a513596274aa5edfe51c8b2e2c603f80fc6550d58e3b523550569ef292112ba0",
         "tests/types/react-subpath-contract.tsx": "795221e7f27234de9e949d096e373af768ff5154190be99c2cb1815f86b8d313",
         "tests/types/reactivity-invalidation-contract.ts": "ffefc4616971161595a8a231f2b3facc0d7872657c71fec044109a30b3c2b3bd",
-        "tests/types/rpc-cast-contract.ts": "28e5b213d6039673a9f497c2b83b31023f4d831745236f5867fb2c519e0377c0",
+        "tests/types/rpc-cast-contract.ts": "2975129f3d1ad6bb5c7f0359b77f2482b0701c20fdb31573c8e5bbfda9741f6e",
         "tests/types/rpc-large-contract.ts": "90a187196bddaa97474c4a18b36a126f24b698e420677c5bde816e37283b1c96",
         "tests/types/server-local-client-contract.ts": "582a121efab98c6c52d371b6f07c3e0c42c07cbb60f0d70f357f24262d677f99",
         "tests/types/setup-overhaul-contract.ts": "a2e5b9845c1686e25f4da8380a3a0479d05b4962533d768f0175c8fa156ef99f",
@@ -896,11 +896,11 @@
         "tests/workflow-guards.test.ts": "563c464dfb45e0873138aff38d323cdfb64b7e6caae84f70fa46db4c65dba410",
         "tsconfig.declarations.json": "761a8825fae46805e260536dc94a6f033c0e49df1de8d3efcf98e6f3046e028a"
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
       "outcome": "no-change",
-      "reason": "Domain boundaries and skill tree coverage remain unchanged by internal performance optimizations and tightened type budgets.",
+      "reason": "Domain boundaries and skill tree coverage remain unchanged by internal performance optimizations and review fixes.",
       "evidence": [
-        "No public exports, adapters, error contracts, or workflow patterns changed across src/ or scripts/performance/budgets.mts."
+        "No public exports, adapters, error contracts, or workflow patterns changed across src/ or tests/."
       ]
     },
     "source:vite.config.ts": {
@@ -4881,15 +4881,27 @@
       ]
     },
     "source:.changeset/single-pass-http-key-canonicalization.md": {
-      "fingerprint": "9cb460035d0805acf431262c29bc446c8b9e4c983fa55d6ae9ca27e5e1926b93",
+      "fingerprint": "ced809bc7c688a0c74e0ea1e1e62d0e6e30436861341ae8fb6a6e56484b67dc8",
       "snapshot": {
-        ".changeset/single-pass-http-key-canonicalization.md": "9009cbad37500c5b9ba917161d624aa10f6fc4d2d783e0073e7db886653db875"
+        ".changeset/single-pass-http-key-canonicalization.md": "93a9b0cf81b4d6b9b047e8650293d85bfd1a713295fdd71bd49fe163183ac0dc"
       },
-      "head": "4ff6c12a8e69ea6f8ad66783f7c5adc08a55ce77",
+      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
       "outcome": "no-change",
       "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
       "evidence": [
         "Reviewed .changeset/single-pass-http-key-canonicalization.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
+      ]
+    },
+    "source:.changeset/poll-ready-stream-publication-pulls.md": {
+      "fingerprint": "45a0841d738e01f0b693c3d413067c7cce062367879a1de8ef90464925c6b734",
+      "snapshot": {
+        ".changeset/poll-ready-stream-publication-pulls.md": "9f58cf32e52dbcd500e25ff2b15853790aca9b1fb35280110cddeeef5f62867e"
+      },
+      "head": "bb19dfec9c6cd14779ac5749734b3a0962254d1d",
+      "outcome": "no-change",
+      "reason": "Patch changeset describes an internal performance optimization that does not alter shipped skill guidance.",
+      "evidence": [
+        "Reviewed .changeset/poll-ready-stream-publication-pulls.md; behavior and public API usage documented in skills/effect-api-query/SKILL.md remain accurate."
       ]
     }
   }

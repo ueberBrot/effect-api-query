@@ -169,8 +169,9 @@ const screenIncoming = (
 
     ancestors.add(value);
     let safe = true;
-    for (const item of value) {
-      if (!screenIncoming(item, ancestors, cache, checked)) {
+    // oxlint-disable-next-line typescript/prefer-for-of
+    for (let index = 0; index < value.length; index += 1) {
+      if (!screenIncoming(value[index], ancestors, cache, checked)) {
         safe = false;
       }
     }

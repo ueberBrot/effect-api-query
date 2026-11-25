@@ -4,12 +4,14 @@ import {
   Effect,
   Exit,
   Layer,
+  Option,
   Predicate,
   Redacted,
   Schema,
   Scope,
 } from "effect";
 import {
+  Headers,
   HttpClient,
   HttpClientRequest,
   HttpClientResponse,
@@ -1433,5 +1435,102 @@ describe("HTTP semantic keys", () => {
       queryClient.clear();
       await Effect.runPromise(Scope.close(scope, Exit.void));
     }
+  });
+
+  it("normalizes Headers.fromInput, custom-prototype header bags, and OptionFromOptionalKey query schemas", () => {
+    const headerBagProto = {};
+    const makeHeaderBag = (
+      token: string,
+      extra?: string,
+      includeExtra = false
+    ): Record<string, string | undefined> => {
+      // oxlint-disable-next-line typescript/no-unsafe-assignment
+      const bag: Record<string, string | undefined> =
+        Object.create(headerBagProto);
+      bag["X-Token"] = token;
+      if (includeExtra) {
+        bag["X-Extra"] = extra;
+      }
+      return bag;
+    };
+    const HeaderBagSchema = Schema.declare(
+      (value): value is Record<string, string | undefined> =>
+        Predicate.isObject(value) &&
+        Object.getPrototypeOf(value) === headerBagProto
+    );
+
+    const regressionApi = HttpApi.make("header-and-optional-key").add(
+      HttpApiGroup.make("items", { topLevel: true })
+        .add(
+          HttpApiEndpoint.get("effectHeaders", "/effect-headers", {
+            headers: Schema.declare(Headers.isHeaders),
+            disableCodecs: true,
+            success: Schema.String,
+          })
+        )
+        .add(
+          HttpApiEndpoint.get("classHeaders", "/class-headers", {
+            headers: HeaderBagSchema,
+            disableCodecs: true,
+            success: Schema.String,
+          })
+        )
+        .add(
+          HttpApiEndpoint.get("optionalQuery", "/optional-query", {
+            query: Schema.OptionFromOptionalKey(
+              Schema.Struct({ page: Schema.Int })
+            ),
+            success: Schema.String,
+          })
+        )
+    );
+    const regressionUtils = createHttpApiQueryUtils(regressionApi, {
+      client: Effect.runSync(makeUnusedHttpClient(regressionApi)),
+      keyPrefix: ["regression"],
+    });
+
+    expect(
+      regressionUtils.effectHeaders
+        .queryKey({
+          input: { headers: Headers.fromInput({ "X-Token": "public" }) },
+        })
+        .at(-1)
+    ).toStrictEqual({
+      headers: { "x-token": "public" },
+    });
+
+    expect(
+      regressionUtils.classHeaders
+        .queryKey({
+          input: { headers: makeHeaderBag("public") },
+        })
+        .at(-1)
+    ).toStrictEqual({
+      headers: { "x-token": "public" },
+    });
+
+    expect(() =>
+      regressionUtils.classHeaders.queryKey({
+        input: { headers: makeHeaderBag("public", undefined, true) },
+      })
+    ).toThrow(expect.objectContaining({ code: "InvalidKeyValue" }));
+
+    expect(
+      regressionUtils.optionalQuery
+        .queryKey({
+          input: { query: Option.none() },
+        })
+        .at(-1)
+    ).toStrictEqual({});
+
+    expect(
+      regressionUtils.optionalQuery
+        .queryKey({
+          input: { query: Option.some({ page: 2 }) },
+        })
+        .at(-1)
+    ).toStrictEqual({
+      query: { page: "2" },
+    });
   });
 });

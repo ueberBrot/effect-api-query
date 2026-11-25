@@ -398,4 +398,38 @@ describe("Schema structural sharing", () => {
     cyclic.push(cyclic);
     expect(() => share(cyclic, cyclic)).toThrow(TypeError);
   });
+
+  it("screens dense array elements by index rather than Symbol.iterator", () => {
+    let filterCalls = 0;
+    const watched = Schema.Unknown.pipe(
+      Schema.check(
+        Schema.makeFilter(() => {
+          filterCalls += 1;
+          return true;
+        })
+      )
+    );
+    const share = schemaStructuralSharing(watched, {
+      equivalence: () => true,
+    });
+    const proxy: unknown[] = new Proxy([0], {
+      get(target, property) {
+        if (property === Symbol.iterator) {
+          return function* emptyIterator() {
+            yield* [];
+          };
+        }
+        if (property === "0") {
+          return proxy;
+        }
+        if (property === "length") {
+          return target.length;
+        }
+        // oxlint-disable-next-line unicorn/no-useless-undefined
+        return undefined;
+      },
+    });
+    expect(() => share([1], proxy)).toThrow(TypeError);
+    expect(filterCalls).toBe(0);
+  });
 });
