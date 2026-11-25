@@ -10,6 +10,11 @@ interface PlainObject {
   readonly [key: PropertyKey]: unknown;
 }
 
+interface ContainerCache {
+  readonly arrays: Map<readonly unknown[], boolean>;
+  readonly objects: Map<PlainObject, readonly string[] | undefined>;
+}
+
 const isPlainDenseArray = (value: readonly unknown[]): boolean => {
   if (Object.getPrototypeOf(value) !== Array.prototype) {
     return false;
@@ -31,9 +36,6 @@ const isPlainDenseArray = (value: readonly unknown[]): boolean => {
 };
 
 const plainObjectKeys = (value: PlainObject): readonly string[] | undefined => {
-  if (Object.getPrototypeOf(value) !== Object.prototype) {
-    return undefined;
-  }
   const keys: string[] = [];
   for (const key of Reflect.ownKeys(value)) {
     const descriptor = Object.getOwnPropertyDescriptor(value, key);
@@ -49,34 +51,76 @@ const plainObjectKeys = (value: PlainObject): readonly string[] | undefined => {
   return keys;
 };
 
+const inspectArray = (
+  value: readonly unknown[],
+  cache: ContainerCache
+): boolean => {
+  const cached = cache.arrays.get(value);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const plain = isPlainDenseArray(value);
+  cache.arrays.set(value, plain);
+  return plain;
+};
+
+const inspectPlainObject = (
+  value: PlainObject,
+  cache: ContainerCache
+): readonly string[] | undefined => {
+  if (Object.getPrototypeOf(value) !== Object.prototype) {
+    return undefined;
+  }
+
+  const cached = cache.objects.get(value);
+  if (cached !== undefined || cache.objects.has(value)) {
+    return cached;
+  }
+
+  const keys = plainObjectKeys(value);
+  cache.objects.set(value, keys);
+  return keys;
+};
+
 const canInspectAtom = (
   value: unknown,
+  cache: ContainerCache,
   checked: Map<object, boolean>
 ): boolean => {
   if (!Predicate.isObjectOrArray(value)) {
     return true;
   }
+
+  if (Array.isArray(value)) {
+    const previous = checked.get(value);
+    if (previous !== undefined) {
+      return previous;
+    }
+
+    checked.set(value, false);
+    const safe =
+      inspectArray(value, cache) &&
+      value.every((item) => canInspectAtom(item, cache, checked));
+    checked.set(value, safe);
+    return safe;
+  }
+
+  const prototype: unknown = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype) {
+    return prototype !== null;
+  }
+
   const previous = checked.get(value);
   if (previous !== undefined) {
     return previous;
   }
+
   checked.set(value, false);
-  let safe: boolean;
-  if (Array.isArray(value)) {
-    safe =
-      isPlainDenseArray(value) &&
-      value.every((item) => canInspectAtom(item, checked));
-  } else {
-    const prototype: unknown = Object.getPrototypeOf(value);
-    if (prototype === Object.prototype) {
-      const keys = plainObjectKeys(value);
-      safe =
-        keys !== undefined &&
-        keys.every((key) => canInspectAtom(value[key], checked));
-    } else {
-      safe = prototype !== null;
-    }
-  }
+  const keys = inspectPlainObject(value, cache);
+  const safe =
+    keys !== undefined &&
+    keys.every((key) => canInspectAtom(value[key], cache, checked));
   checked.set(value, safe);
   return safe;
 };
@@ -98,31 +142,76 @@ const setOwnDataProperty = (
   }
 };
 
-const assertAcyclic = (
+const screenIncoming = (
   value: unknown,
   ancestors: Set<object>,
-  completed: Set<object>
-): void => {
-  if (!Predicate.isObjectOrArray(value) || completed.has(value)) {
-    return;
+  cache: ContainerCache,
+  checked: Map<object, boolean>
+): boolean => {
+  if (!Predicate.isObjectOrArray(value)) {
+    return true;
   }
+
+  if (Array.isArray(value)) {
+    if (ancestors.has(value)) {
+      throw new TypeError("Schema sharing requires acyclic plain containers");
+    }
+
+    const existing = checked.get(value);
+    if (existing !== undefined) {
+      return existing;
+    }
+
+    if (!inspectArray(value, cache)) {
+      checked.set(value, false);
+      return false;
+    }
+
+    ancestors.add(value);
+    let safe = true;
+    // oxlint-disable-next-line typescript/prefer-for-of
+    for (let index = 0; index < value.length; index += 1) {
+      if (!screenIncoming(value[index], ancestors, cache, checked)) {
+        safe = false;
+      }
+    }
+    ancestors.delete(value);
+
+    checked.set(value, safe);
+    return safe;
+  }
+
+  const prototype: unknown = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype) {
+    return prototype !== null;
+  }
+
   if (ancestors.has(value)) {
     throw new TypeError("Schema sharing requires acyclic plain containers");
   }
+
+  const existing = checked.get(value);
+  if (existing !== undefined) {
+    return existing;
+  }
+
+  const keys = inspectPlainObject(value, cache);
+  if (keys === undefined) {
+    checked.set(value, false);
+    return false;
+  }
+
   ancestors.add(value);
-  if (Array.isArray(value)) {
-    if (isPlainDenseArray(value)) {
-      for (const item of value) {
-        assertAcyclic(item, ancestors, completed);
-      }
-    }
-  } else {
-    for (const key of plainObjectKeys(value) ?? []) {
-      assertAcyclic(value[key], ancestors, completed);
+  let safe = true;
+  for (const key of keys) {
+    if (!screenIncoming(value[key], ancestors, cache, checked)) {
+      safe = false;
     }
   }
   ancestors.delete(value);
-  completed.add(value);
+
+  checked.set(value, safe);
+  return safe;
 };
 
 type ShareNode = (previous: unknown, incoming: unknown) => unknown;
@@ -130,12 +219,13 @@ type ShareNode = (previous: unknown, incoming: unknown) => unknown;
 const shareArray = (
   previous: unknown,
   incoming: readonly unknown[],
+  cache: ContainerCache,
   share: ShareNode
 ): unknown => {
   if (
-    !isPlainDenseArray(incoming) ||
+    !inspectArray(incoming, cache) ||
     !Array.isArray(previous) ||
-    !isPlainDenseArray(previous)
+    !inspectArray(previous, cache)
   ) {
     return incoming;
   }
@@ -191,16 +281,15 @@ const copyPrefixProperties = (
 const sharePlainObject = (
   previous: unknown,
   incoming: PlainObject,
+  cache: ContainerCache,
   share: ShareNode
 ): unknown => {
-  const keys = plainObjectKeys(incoming);
-  if (keys === undefined) {
+  const keys = inspectPlainObject(incoming, cache);
+  if (keys === undefined || !Predicate.isObject(previous)) {
     return incoming;
   }
-  const oldKeys = Predicate.isObject(previous)
-    ? plainObjectKeys(previous)
-    : undefined;
-  if (oldKeys === undefined || !Predicate.isObject(previous)) {
+  const oldKeys = inspectPlainObject(previous, cache);
+  if (oldKeys === undefined) {
     return incoming;
   }
   let sameAsPrevious: boolean = keys.length === oldKeys.length;
@@ -251,14 +340,18 @@ export const schemaStructuralSharing = <T>(
 ): ((previous: unknown, incoming: unknown) => unknown) => {
   const accepts = Schema.is(schema);
   return (previous, incoming) => {
-    assertAcyclic(incoming, new Set(), new Set());
+    const cache: ContainerCache = {
+      arrays: new Map(),
+      objects: new Map(),
+    };
     const checked = new Map<object, boolean>();
+    screenIncoming(incoming, new Set(), cache, checked);
     const share: ShareNode = (oldValue, newValue) => {
       if (Object.is(oldValue, newValue)) {
         return oldValue;
       }
-      if (canInspectAtom(newValue, checked)) {
-        const canInspectPrevious = canInspectAtom(oldValue, checked);
+      if (canInspectAtom(newValue, cache, checked)) {
+        const canInspectPrevious = canInspectAtom(oldValue, cache, checked);
         if (accepts(newValue)) {
           return canInspectPrevious &&
             accepts(oldValue) &&
@@ -268,10 +361,10 @@ export const schemaStructuralSharing = <T>(
         }
       }
       if (Array.isArray(newValue)) {
-        return shareArray(oldValue, newValue, share);
+        return shareArray(oldValue, newValue, cache, share);
       }
       if (Predicate.isObject(newValue)) {
-        return sharePlainObject(oldValue, newValue, share);
+        return sharePlainObject(oldValue, newValue, cache, share);
       }
       return newValue;
     };

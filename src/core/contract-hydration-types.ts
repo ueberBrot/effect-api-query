@@ -243,14 +243,16 @@ export type RpcPathsConstraint<
   ActualPaths,
 > = ActualPaths extends undefined
   ? undefined
-  : {
-      readonly [
-        Path in keyof ActualPaths & RpcsOf<Group>["_tag"]
-      ]?: RpcPathConfig<
-        Extract<RpcsOf<Group>, { readonly _tag: Path }>,
-        ActualPaths[Path]
-      >;
-    } & ExactKeys<ActualPaths, RpcsOf<Group>["_tag"]>;
+  : RpcsOf<Group> extends infer Rpcs extends Rpc.Any
+    ? Rpcs["_tag"] extends infer Tags extends string
+      ? {
+          readonly [Path in keyof ActualPaths & Tags]?: RpcPathConfig<
+            Extract<Rpcs, { readonly _tag: Path }>,
+            ActualPaths[Path]
+          >;
+        } & ExactKeys<ActualPaths, Tags>
+      : never
+    : never;
 
 export type ValidateKeyPrefix<Actual> = "keyPrefix" extends keyof Actual
   ? Actual["keyPrefix"] extends KeyPrefix
@@ -300,15 +302,17 @@ export type RpcUnmodifiedServices<
   R extends Rpc.Any,
   Views,
   Channel extends ServiceChannel,
-> = R extends Rpc.Any
-  ? [StreamingRpc<R>] extends [never]
-    ? true extends ViewEnabled<Views, "query">
-      ? RpcSchemaServices<R, Channel>
-      : never
-    : true extends ViewEnabled<Views, "live"> | ViewEnabled<Views, "streamed">
-      ? RpcSchemaServices<R, Channel>
-      : never
-  : never;
+> = [Views] extends [undefined]
+  ? RpcSchemaServices<R, Channel>
+  : R extends Rpc.Any
+    ? [StreamingRpc<R>] extends [never]
+      ? true extends ViewEnabled<Views, "query">
+        ? RpcSchemaServices<R, Channel>
+        : never
+      : true extends ViewEnabled<Views, "live"> | ViewEnabled<Views, "streamed">
+        ? RpcSchemaServices<R, Channel>
+        : never
+    : never;
 
 export type RpcModifiedPathServices<
   R extends Rpc.Any,
@@ -519,11 +523,14 @@ export type HttpPathsConstraint<
   ActualPaths,
 > = ActualPaths extends undefined
   ? undefined
-  : {
-      readonly [
-        Path in keyof ActualPaths & HttpContractPaths<Api>
-      ]?: HttpPathConfig<HttpEndpointAtPath<Api, Path>, ActualPaths[Path]>;
-    } & ExactKeys<ActualPaths, HttpContractPaths<Api>>;
+  : HttpContractPaths<Api> extends infer Allowed extends string
+    ? {
+        readonly [Path in keyof ActualPaths & Allowed]?: HttpPathConfig<
+          HttpEndpointAtPath<Api, Path>,
+          ActualPaths[Path]
+        >;
+      } & ExactKeys<ActualPaths, Allowed>
+    : never;
 
 /** Configuration for deriving a hydration registry from an Effect `HttpApi`. */
 export type HttpContractHydrationOptions<
@@ -568,15 +575,17 @@ export type HttpEndpointUnmodifiedServices<
   Endpoint extends HttpApiEndpoint.ConstraintRequest,
   Views,
   Channel extends ServiceChannel,
-> = Endpoint extends HttpApiEndpoint.ConstraintRequest
-  ? [StreamingEndpoint<Endpoint>] extends [never]
-    ? true extends ViewEnabled<Views, "query"> | MetadataViewEnabled<Views>
-      ? HttpEndpointSchemaServices<Endpoint, Channel>
-      : never
-    : true extends ViewEnabled<Views, "live"> | ViewEnabled<Views, "streamed">
-      ? HttpEndpointSchemaServices<Endpoint, Channel>
-      : never
-  : never;
+> = [Views] extends [undefined]
+  ? HttpEndpointSchemaServices<Endpoint, Channel>
+  : Endpoint extends HttpApiEndpoint.ConstraintRequest
+    ? [StreamingEndpoint<Endpoint>] extends [never]
+      ? true extends ViewEnabled<Views, "query"> | MetadataViewEnabled<Views>
+        ? HttpEndpointSchemaServices<Endpoint, Channel>
+        : never
+      : true extends ViewEnabled<Views, "live"> | ViewEnabled<Views, "streamed">
+        ? HttpEndpointSchemaServices<Endpoint, Channel>
+        : never
+    : never;
 
 export type HttpGroupBareServices<
   Group extends HttpApiGroup.Constraint,

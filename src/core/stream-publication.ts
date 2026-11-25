@@ -102,19 +102,30 @@ const batchStream = <A, E, R>(
       });
 
       const pullOrWaitDeadline = Effect.gen(function* pullOrDeadline() {
-        let activePull = pendingPull;
-        if (activePull === undefined) {
-          activePull = yield* Effect.forkIn(pull, scope, {
+        const activePull =
+          pendingPull ??
+          (yield* Effect.forkIn(pull, scope, {
             startImmediately: true,
-          });
-          pendingPull = activePull;
+          }));
+
+        const polled = activePull.pollUnsafe();
+        if (polled !== undefined) {
+          pendingPull = undefined;
+          return { _tag: "Pull" as const, exit: polled };
         }
+        pendingPull = activePull;
+
         const gate = deadline?.gate;
         if (gate === undefined) {
           const exit = yield* Fiber.await(activePull);
           pendingPull = undefined;
           return { _tag: "Pull" as const, exit };
         }
+
+        if (Deferred.isDoneUnsafe(gate)) {
+          return { _tag: "Deadline" as const };
+        }
+
         const outcome = yield* Effect.raceFirst(
           Fiber.await(activePull).pipe(
             Effect.map((exit) => ({ _tag: "Pull" as const, exit }))

@@ -1,5 +1,6 @@
 import {
   Context,
+  Equal,
   Predicate,
   RegExp as EffectRegExp,
   Schema,
@@ -9,7 +10,10 @@ import { Headers, HttpMethod } from "effect/http";
 import { HttpApi } from "effect/http-api";
 import type { HttpApiEndpoint } from "effect/http-api";
 
-import { canonicalize } from "../core/canonical-key";
+import {
+  canonicalize,
+  canonicalizeOmittingUndefined,
+} from "../core/canonical-key";
 import type { OperationInput } from "../core/operation";
 import { createSchemaKeyEncoding } from "../core/schema-key";
 import type { SchemaKeyEncoding } from "../core/schema-key";
@@ -32,7 +36,43 @@ export type HttpRequestDescription = (
 ) & { readonly parts: readonly string[] };
 
 const requestParts = ["params", "query", "headers", "payload"] as const;
-type RequestFields = Partial<Record<(typeof requestParts)[number], Schema.Top>>;
+type RequestPart = (typeof requestParts)[number];
+type RequestFields = Partial<Record<RequestPart, Schema.Top>>;
+
+const partEncodings: Record<
+  RequestPart,
+  WeakMap<Schema.Top, SchemaKeyEncoding>
+> = {
+  params: new WeakMap(),
+  query: new WeakMap(),
+  headers: new WeakMap(),
+  payload: new WeakMap(),
+};
+
+const getPartKeyEncoding = (
+  part: RequestPart,
+  schema: Schema.Top,
+  options: SchemaAST.ParseOptions | undefined
+): SchemaKeyEncoding => {
+  if (options !== undefined) {
+    return createSchemaKeyEncoding(Schema.Struct({ [part]: schema }), options);
+  }
+
+  const cache = partEncodings[part];
+  const cached = cache.get(schema);
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  const encoding = createSchemaKeyEncoding(
+    Schema.Struct({ [part]: schema }),
+    undefined
+  );
+  if (encoding.cacheable) {
+    cache.set(schema, encoding);
+  }
+  return encoding;
+};
 type RedactionAnalysis = "Safe" | "RequiresEncoder" | "Retry";
 
 interface EndpointRedactedNames {
@@ -255,38 +295,40 @@ const requestKeyEncoding = (
     const options = overrides[part] ?? fallback;
     return schema === undefined ? [] : [{ part, schema, options }];
   });
-  const baseEncoding: SchemaKeyEncoding = parts.every(
-    ({ options }) => options === undefined
-  )
-    ? createSchemaKeyEncoding(Schema.Struct(fields))
-    : (() => {
-        const encoders = parts.map(
-          ({ part, schema, options }) =>
-            [part, createSchemaKeyEncoding(schema, options)] as const
-        );
-        return {
-          requiresEncoder: encoders.some(
-            ([, encoding]) => encoding.requiresEncoder
-          ),
-          cacheable: encoders.every(([, encoding]) => encoding.cacheable),
-          encode: (input) => {
-            if (!Predicate.isObject(input)) {
-              throw new TypeError("HTTP request input must be an object");
-            }
-            return Object.fromEntries(
-              encoders.map(([part, encoding]) => [
-                part,
-                encoding.encode(input[part]),
-              ])
-            );
-          },
-        };
-      })();
+  const encoders = parts.map(
+    ({ part, schema, options }) =>
+      [part, getPartKeyEncoding(part, schema, options)] as const
+  );
+
+  const requiresEncoder =
+    encoders.some(([, encoding]) => encoding.requiresEncoder) ||
+    redactedAnalysis !== "Safe";
+  const cacheable =
+    encoders.every(([, encoding]) => encoding.cacheable) &&
+    redactedAnalysis !== "Retry";
+
   return {
-    requiresEncoder:
-      baseEncoding.requiresEncoder || redactedAnalysis !== "Safe",
-    cacheable: baseEncoding.cacheable && redactedAnalysis !== "Retry",
-    encode: baseEncoding.encode,
+    requiresEncoder,
+    cacheable,
+    encode: (input) => {
+      if (!Predicate.isObject(input)) {
+        throw new TypeError("HTTP request input must be an object");
+      }
+
+      // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
+      const encoded: Record<string, unknown> = {};
+      for (const [part, encoding] of encoders) {
+        const partInput = part in input ? { [part]: input[part] } : {};
+        const partEncoded = encoding.encode(partInput);
+        if (
+          Predicate.isObject(partEncoded) &&
+          Object.hasOwn(partEncoded, part)
+        ) {
+          encoded[part] = partEncoded[part];
+        }
+      }
+      return encoded;
+    },
   };
 };
 
@@ -452,66 +494,117 @@ const normalizeUrlEncodedPart = (
 const normalizeHeaders = (
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type
   rawHeaders: Record<string, unknown>,
-  redactedPatterns: readonly (string | RegExp)[]
-): Record<string, JsonValue> => {
-  // oxlint-disable-next-line typescript/no-unsafe-assignment
-  const headers: Record<string, JsonValue> = Object.create(null);
-  for (const [name, headerValue] of Object.entries(rawHeaders)) {
+  redactedPatterns: readonly (string | RegExp)[],
+  seen: WeakSet<object>
+): JsonValue => {
+  if (seen.has(rawHeaders)) {
+    throw new TypeError("Key values must not contain cycles");
+  }
+  seen.add(rawHeaders);
+
+  const prototype: unknown = Object.getPrototypeOf(rawHeaders);
+  const plain = prototype === Object.prototype || prototype === null;
+  const lowered = new Map<string, JsonValue>();
+
+  for (const name of Object.keys(rawHeaders)) {
+    const headerValue = rawHeaders[name];
+    if (plain && headerValue === undefined) {
+      continue;
+    }
     if (matchesHeaderRedaction(name, redactedPatterns)) {
       throw new TypeError("Redacted HTTP headers require a custom key encoder");
     }
+
     const lower = name.toLowerCase();
-    const canonicalValue = canonicalize(headerValue);
-    if (
-      Object.hasOwn(headers, lower) &&
-      JSON.stringify(headers[lower]) !== JSON.stringify(canonicalValue)
-    ) {
+    if (lower === "__proto__" || lower === "constructor") {
+      throw new TypeError(
+        "Key objects must not contain __proto__ or constructor properties"
+      );
+    }
+
+    const canonicalValue = plain
+      ? canonicalizeOmittingUndefined(headerValue, seen)
+      : canonicalize(headerValue, seen);
+    const existing = lowered.get(lower);
+    if (existing !== undefined && !Equal.equals(existing, canonicalValue)) {
       throw new TypeError(
         "Encoded header names must not have conflicting values"
       );
     }
-    headers[lower] = canonicalValue;
+    lowered.set(lower, canonicalValue);
   }
-  return headers;
+  seen.delete(rawHeaders);
+
+  const sortedKeys = [...lowered.keys()];
+  sortedKeys.sort();
+  const headers: Record<string, JsonValue> = {};
+  for (const key of sortedKeys) {
+    const entry = lowered.get(key);
+    if (entry !== undefined) {
+      headers[key] = entry;
+    }
+  }
+  return Object.freeze(headers);
 };
 
 const normalizeRequestKey = (
   // oxlint-disable-next-line anti-slop/no-unknown-parameters
   value: unknown,
   options: RequestNormalizationOptions
-) => {
-  const request = omitUndefined(value);
-  if (!Predicate.isObject(request)) {
+): JsonValue => {
+  if (!Predicate.isObject(value)) {
     throw new TypeError("Encoded HTTP requests must be objects");
   }
-  const headers = Predicate.isObject(request["headers"])
-    ? normalizeHeaders(request["headers"], options.redactedNames.headers)
-    : undefined;
-  const query =
-    "query" in request
-      ? normalizeUrlEncodedPart(request["query"], options.redactedNames.query)
-      : undefined;
-  const payload =
-    options.urlEncodedPayload && "payload" in request
-      ? normalizeUrlEncodedPart(
-          request["payload"],
-          options.redactPayloadAsQuery ? options.redactedNames.query : []
-        )
-      : undefined;
-  const hasQueryChange = "query" in request && query !== request["query"];
-  const hasPayloadChange =
-    options.urlEncodedPayload &&
-    "payload" in request &&
-    payload !== request["payload"];
-  if (headers === undefined && !hasQueryChange && !hasPayloadChange) {
-    return request;
+  const prototype: unknown = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    throw new TypeError("Key values must contain only plain objects");
   }
-  return {
-    ...request,
-    ...(headers === undefined ? undefined : { headers }),
-    ...(hasQueryChange ? { query } : undefined),
-    ...(hasPayloadChange ? { payload } : undefined),
-  };
+
+  const seen = new WeakSet();
+  seen.add(value);
+
+  const keys = Object.keys(value);
+  keys.sort();
+  const canonical: Record<string, JsonValue> = {};
+  for (const key of keys) {
+    const item = value[key];
+    if (item === undefined) {
+      continue;
+    }
+    if (key === "__proto__" || key === "constructor") {
+      throw new TypeError(
+        "Key objects must not contain __proto__ or constructor properties"
+      );
+    }
+
+    if (key === "headers" && Predicate.isObject(item)) {
+      canonical[key] = normalizeHeaders(
+        item,
+        options.redactedNames.headers,
+        seen
+      );
+    } else if (key === "query") {
+      const cleaned = omitUndefined(item, seen);
+      canonical[key] = canonicalize(
+        normalizeUrlEncodedPart(cleaned, options.redactedNames.query),
+        seen
+      );
+    } else if (key === "payload" && options.urlEncodedPayload) {
+      const cleaned = omitUndefined(item, seen);
+      canonical[key] = canonicalize(
+        normalizeUrlEncodedPart(
+          cleaned,
+          options.redactPayloadAsQuery ? options.redactedNames.query : []
+        ),
+        seen
+      );
+    } else {
+      canonical[key] = canonicalizeOmittingUndefined(item, seen);
+    }
+  }
+
+  seen.delete(value);
+  return Object.freeze(canonical);
 };
 
 export const createHttpRequest = (
@@ -548,7 +641,10 @@ export const createHttpRequest = (
   }
   const { payloads, payloadEncoding } = classified;
   if (payloads.length > 0) {
-    fields["payload"] = Schema.Union(payloads);
+    fields["payload"] =
+      payloads.length === 1 && payloads[0] !== undefined
+        ? payloads[0]
+        : Schema.Union(payloads);
   }
   const parts = Object.keys(fields);
   const description =
@@ -606,12 +702,14 @@ export const createHttpRequest = (
             error
           );
         }
+        if (encoder) {
+          return { input, keyValue };
+        }
         try {
           return {
             input,
-            keyValue: encoder
-              ? keyValue
-              : normalizeRequestKey(keyValue, normalization),
+            keyValue: normalizeRequestKey(keyValue, normalization),
+            canonical: true as const,
           };
         } catch (error) {
           throw invalidKey(error);

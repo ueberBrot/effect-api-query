@@ -17,7 +17,17 @@ export type OperationInput =
       readonly prepare: (
         input: unknown,
         encoder: RuntimeKeyEncoder | undefined
-      ) => { readonly input: unknown; readonly keyValue: unknown };
+      ) =>
+        | {
+            readonly input: unknown;
+            readonly keyValue: JsonValue;
+            readonly canonical: true;
+          }
+        | {
+            readonly input: unknown;
+            readonly keyValue: unknown;
+            readonly canonical?: false | undefined;
+          };
       readonly invalidKey: (cause: unknown) => Error;
     };
 
@@ -43,16 +53,23 @@ export interface BufferedOperation extends OperationIdentity {
   ) => Error;
 }
 
+export interface MetadataOperation {
+  readonly invoke: BufferedOperation["invoke"];
+  readonly executionError: (
+    operation: "metadata",
+    cause: Cause.Cause<unknown>
+  ) => Error;
+}
+
 export interface UnaryOperation extends BufferedOperation {
   readonly kind: "Unary";
   readonly input: OperationInput;
-  readonly metadata?: {
-    readonly invoke: BufferedOperation["invoke"];
-    readonly executionError: (
-      operation: "metadata",
-      cause: Cause.Cause<unknown>
-    ) => Error;
-  };
+  readonly prepareMetadata?: (
+    options: Record<string, unknown>,
+    runPromiseExit: RunPromiseExit<unknown>,
+    requestOptions: unknown,
+    skipped: boolean
+  ) => (input: unknown) => QueryFunction;
 }
 
 export interface MutationOperation extends BufferedOperation {

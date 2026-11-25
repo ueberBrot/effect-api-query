@@ -131,3 +131,87 @@ true satisfies Assert<
     RuntimeInput<EncodingService>
   >
 >;
+
+class IsolatedErrorsGroup extends RpcGroup.make(
+  Rpc.make("alpha", {
+    success: Schema.String,
+    error: Schema.Literal("only-a"),
+  }),
+  Rpc.make("beta", {
+    success: Schema.String,
+    error: Schema.Literal("only-b"),
+  })
+) {}
+
+declare const standardObjectClient: RpcClient.RpcClient<
+  RpcGroup.Rpcs<typeof IsolatedErrorsGroup>
+>;
+declare const transportObjectClient: RpcClient.RpcClient<
+  RpcGroup.Rpcs<typeof IsolatedErrorsGroup>,
+  "transport-failed"
+>;
+declare const subtypedObjectClient: RpcClient.RpcClient<
+  RpcGroup.Rpcs<typeof IsolatedErrorsGroup>
+> & { readonly marker?: true };
+declare const customObjectClient: Pick<
+  RpcClient.RpcClient<RpcGroup.Rpcs<typeof IsolatedErrorsGroup>, "extra-a">,
+  "alpha"
+> &
+  Pick<RpcClient.RpcClient<RpcGroup.Rpcs<typeof IsolatedErrorsGroup>>, "beta">;
+
+const unprefixedObjectUtils = createRpcQueryUtils(IsolatedErrorsGroup, {
+  client: standardObjectClient,
+});
+const prefixedObjectUtils = createRpcQueryUtils(IsolatedErrorsGroup, {
+  client: standardObjectClient,
+  keyPrefix: ["isolated"],
+});
+const subtypedObjectUtils = createRpcQueryUtils(IsolatedErrorsGroup, {
+  client: subtypedObjectClient,
+  keyPrefix: ["isolated-subtyped"],
+});
+const transportObjectUtils = createRpcQueryUtils(IsolatedErrorsGroup, {
+  client: transportObjectClient,
+  keyPrefix: ["isolated-transport"],
+});
+const customObjectUtils = createRpcQueryUtils(IsolatedErrorsGroup, {
+  client: customObjectClient,
+  keyPrefix: ["isolated-custom"],
+});
+
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof unprefixedObjectUtils.alpha>,
+    EffectRpcQueryError<"only-a">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof prefixedObjectUtils.alpha>,
+    EffectRpcQueryError<"only-a">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof subtypedObjectUtils.alpha>,
+    EffectRpcQueryError<"only-a">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof transportObjectUtils.alpha>,
+    EffectRpcQueryError<"only-a" | "transport-failed">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof customObjectUtils.alpha>,
+    EffectRpcQueryError<"only-a" | "extra-a">
+  >
+>;
+true satisfies Assert<
+  Equal<
+    InferQueryError<typeof customObjectUtils.beta>,
+    EffectRpcQueryError<"only-b" | "extra-a">
+  >
+>;

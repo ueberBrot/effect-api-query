@@ -26,6 +26,7 @@ import { inputKind } from "./prepared-input";
 import { isStreamPolicyOption } from "./streamed-query";
 import type {
   OwnedMutationOption,
+  ParentPrefixes,
   StreamedPolicyOptions,
   LivePolicyOptions,
   KeysOfUnion,
@@ -206,10 +207,9 @@ export type ExactPathConfiguration<Node, Actual> = ExtraProperties<
 > &
   ExactViews<Node, Actual>;
 
-export type ExactPaths<Node, Paths> = ExtraProperties<
-  PathConfigurations<Node>,
-  Paths
-> & {
+export type ExactPaths<Node, Paths> = {
+  readonly [Key in Exclude<KeysOfUnion<Paths>, NodePaths<Node>>]: never;
+} & {
   readonly [Path in KeysOfUnion<Paths> & NodePaths<Node>]?: ExactPathViews<
     LookupPath<Node, Path>,
     Path,
@@ -217,12 +217,18 @@ export type ExactPaths<Node, Paths> = ExtraProperties<
   >;
 };
 
-export type ExactConfiguration<Node, Actual> = ExactViews<Node, Actual> &
-  ExtraProperties<UtilsConfiguration<Node>, Actual> & {
-    readonly paths?: "paths" extends KeysOfUnion<Actual>
-      ? ExactPaths<Node, NonNullable<Property<Actual, "paths">>>
-      : unknown;
-  };
+export type ExactConfiguration<Node, Actual> = ExactViews<Node, Actual> & {
+  readonly [
+    Key in Exclude<
+      KeysOfUnion<Actual>,
+      keyof NodeViews<Node> | (IsLeaf<Node> extends true ? never : "paths")
+    >
+  ]: never;
+} & {
+  readonly paths?: "paths" extends KeysOfUnion<Actual>
+    ? ExactPaths<Node, NonNullable<Property<Actual, "paths">>>
+    : unknown;
+};
 
 export type HasRetention<Configuration> = [Configuration] extends [never]
   ? false
@@ -243,18 +249,6 @@ export type ConfigPaths<Configuration> = [Configuration] extends [
 ]
   ? Paths
   : object;
-
-export type ConfigHasAnyRetention<
-  Configuration,
-  Paths = ConfigPaths<Configuration>,
-> =
-  HasRetention<Configuration> extends true
-    ? true
-    : true extends {
-          [Path in keyof Paths]-?: HasRetention<Paths[Path]>;
-        }[keyof Paths]
-      ? true
-      : false;
 
 export type WithDefaultRetention<Builder> =
   UnaryQueryBuilderDescriptor<Builder> extends infer Descriptor
@@ -315,11 +309,23 @@ export type JoinPath<
   Key extends string,
 > = Prefix extends "" ? Key : `${Prefix}.${Key}`;
 
+export type RetentionPathKeys<Paths> = {
+  [Path in keyof Paths & string]-?: HasRetention<Paths[Path]> extends true
+    ? Path
+    : never;
+}[keyof Paths & string];
+
+export type ActiveRetentionPaths<Paths> =
+  RetentionPathKeys<Paths> extends infer Matching extends string
+    ? Matching | ParentPrefixes<Matching>
+    : never;
+
 export type ApplyRetentionTree<
   Node,
   Paths,
   Inherited extends boolean,
   Prefix extends string = "",
+  ActivePaths extends string = ActiveRetentionPaths<Paths>,
 > = {
   readonly [Key in keyof Node]: Key extends string
     ? Key extends "streamedOptions"
@@ -334,30 +340,47 @@ export type ApplyRetentionTree<
           ? Inherited extends true
             ? WithDefaultFilterRetention<Node[Key]>
             : Node[Key]
-          : Node[Key] extends UtilityNode
-            ? ApplyRetentionTree<
-                Node[Key],
-                Paths,
-                Inherited extends true
-                  ? true
-                  : JoinPath<Prefix, Key> extends keyof Paths
-                    ? HasRetention<Paths[JoinPath<Prefix, Key>]>
-                    : false,
-                JoinPath<Prefix, Key>
-              >
-            : Node[Key]
+          : Inherited extends true
+            ? Node[Key] extends
+                | { readonly queryOptions: unknown }
+                | { readonly mutationOptions: unknown }
+              ? Node[Key]
+              : Node[Key] extends UtilityNode
+                ? ApplyRetentionTree<
+                    Node[Key],
+                    Paths,
+                    true,
+                    JoinPath<Prefix, Key>,
+                    ActivePaths
+                  >
+                : Node[Key]
+            : JoinPath<Prefix, Key> extends ActivePaths
+              ? Node[Key] extends UtilityNode
+                ? ApplyRetentionTree<
+                    Node[Key],
+                    Paths,
+                    JoinPath<Prefix, Key> extends keyof Paths
+                      ? HasRetention<Paths[JoinPath<Prefix, Key>]>
+                      : false,
+                    JoinPath<Prefix, Key>,
+                    ActivePaths
+                  >
+                : Node[Key]
+              : Node[Key]
     : Node[Key];
 };
 
 /** Preserves leaf builders and makes configured stream retention optional at call sites. */
 export type ConfiguredUtils<Node, Configuration> =
-  ConfigHasAnyRetention<Configuration> extends true
-    ? ApplyRetentionTree<
-        Node,
-        ConfigPaths<Configuration>,
-        HasRetention<Configuration>
-      >
-    : Node;
+  HasRetention<Configuration> extends true
+    ? ApplyRetentionTree<Node, ConfigPaths<Configuration>, true, "", never>
+    : ConfigPaths<Configuration> extends infer Paths
+      ? ActiveRetentionPaths<Paths> extends infer Active extends string
+        ? [Active] extends [never]
+          ? Node
+          : ApplyRetentionTree<Node, Paths, false, "", Active>
+        : Node
+      : Node;
 
 type ConfigurationViews = QueryView | "mutation";
 

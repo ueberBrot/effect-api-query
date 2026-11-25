@@ -52,6 +52,17 @@ export type InvalidUtilityPath =
   | "parent"
   | "descendant";
 
+interface PathTrieNode {
+  readonly children: Map<string, PathTrieNode>;
+  leaf: boolean;
+  firstDescendant?: readonly string[] | undefined;
+}
+
+const createTrieNode = (): PathTrieNode => ({
+  children: new Map(),
+  leaf: false,
+});
+
 export const validateUtilityPaths = <
   Operation extends { readonly path: readonly string[] },
 >(
@@ -62,35 +73,46 @@ export const validateUtilityPaths = <
     conflictingPath: readonly string[]
   ) => Error
 ): void => {
-  const paths = new Map<string, readonly string[] | null>();
+  const root = createTrieNode();
+
   for (const operation of operations) {
     const { path } = operation;
-    if (
-      path.length === 0 ||
-      path.some((segment) => !segment || reservedSegments.has(segment))
-    ) {
+    if (path.length === 0) {
       throw error(operation, "invalid", path);
     }
-    const key = JSON.stringify(path);
-    const match = paths.get(key);
-    if (match !== undefined) {
-      throw error(
-        operation,
-        match === null ? "duplicate" : "descendant",
-        match ?? path
-      );
-    }
-    for (let index = 1; index < path.length; index += 1) {
-      const parent = path.slice(0, index);
-      const parentKey = JSON.stringify(parent);
-      const parentMatch = paths.get(parentKey);
-      if (parentMatch === null) {
-        throw error(operation, "parent", parent);
-      }
-      if (parentMatch === undefined) {
-        paths.set(parentKey, path);
+    for (const segment of path) {
+      if (!segment || reservedSegments.has(segment)) {
+        throw error(operation, "invalid", path);
       }
     }
-    paths.set(key, null);
+
+    let current = root;
+    for (let index = 0; index < path.length; index += 1) {
+      const segment = path[index];
+      if (segment === undefined) {
+        throw error(operation, "invalid", path);
+      }
+      if (current.leaf) {
+        throw error(operation, "parent", path.slice(0, index));
+      }
+
+      let child = current.children.get(segment);
+      if (child === undefined) {
+        child = createTrieNode();
+        current.children.set(segment, child);
+      }
+      if (index < path.length - 1 && child.firstDescendant === undefined) {
+        child.firstDescendant = path;
+      }
+      current = child;
+    }
+
+    if (current.leaf) {
+      throw error(operation, "duplicate", path);
+    }
+    if (current.children.size > 0) {
+      throw error(operation, "descendant", current.firstDescendant ?? path);
+    }
+    current.leaf = true;
   }
 };

@@ -3,7 +3,10 @@ import type { Cause } from "effect";
 import type { HttpClientResponse } from "effect/http";
 import type { HttpApi } from "effect/http-api";
 
-import { freezeMetadata } from "../core/metadata-query";
+import {
+  freezeMetadata,
+  prepareMetadataExecution,
+} from "../core/metadata-query";
 import type {
   MutationOperation,
   StreamingOperation,
@@ -181,24 +184,37 @@ const extractHttpEndpoints = (
         invoke: (requestInput) => invoke(requestInput, "decoded-only"),
         ...(request.kind === "Unary"
           ? {
-              metadata: {
-                // oxlint-disable-next-line anti-slop/no-unknown-parameters
-                invoke: (requestInput: unknown) =>
-                  Effect.map(
-                    // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
-                    invoke(requestInput, "decoded-and-response"),
-                    ([data, response]) =>
-                      freezeMetadata({
-                        data: data === undefined ? null : data,
-                        status: response.status,
-                        headers: response.headers,
-                      })
-                  ),
-                executionError: (
-                  operation: "metadata",
-                  cause: Cause.Cause<unknown>
-                ) => new EffectHttpApiQueryError(identity, operation, cause),
-              },
+              prepareMetadata: (
+                options,
+                runPromiseExit,
+                requestOptions,
+                skipped
+              ) =>
+                prepareMetadataExecution(
+                  {
+                    // oxlint-disable-next-line anti-slop/no-unknown-parameters
+                    invoke: (requestInput: unknown) =>
+                      Effect.map(
+                        // oxlint-disable-next-line effecttsgo/any-unknown-in-error-context
+                        invoke(requestInput, "decoded-and-response"),
+                        ([data, response]) =>
+                          freezeMetadata({
+                            data: data === undefined ? null : data,
+                            status: response.status,
+                            headers: response.headers,
+                          })
+                      ),
+                    executionError: (
+                      operation: "metadata",
+                      cause: Cause.Cause<unknown>
+                    ) =>
+                      new EffectHttpApiQueryError(identity, operation, cause),
+                  },
+                  options,
+                  runPromiseExit,
+                  requestOptions,
+                  skipped
+                ),
             }
           : undefined),
         executionError: (operation, cause) =>
@@ -213,11 +229,16 @@ const httpTreeErrors = (
   api: HttpApi.Top,
   operations: readonly HttpOperation[]
 ): TreeErrors => {
-  const identities = new Map(
-    operations.map((operation) => [operation.id, operation.identity])
-  );
-  const identity = (id: string) =>
-    identities.get(id) ?? { apiId: api.identifier };
+  let identities: Map<string, HttpApiEndpointIdentity> | undefined;
+  const identity = (id: string) => {
+    if (identities === undefined) {
+      identities = new Map();
+      for (const operation of operations) {
+        identities.set(operation.id, operation.identity);
+      }
+    }
+    return identities.get(id) ?? { apiId: api.identifier };
+  };
   return {
     invalidPrefix: (reason, cause) =>
       new EffectHttpApiQueryConfigError(
@@ -263,30 +284,33 @@ export const compileHttpOperations = (
 ): CompiledHttpOperations => {
   const operations = extractHttpEndpoints(api, client);
   const errors = httpTreeErrors(api, operations);
-  const encoderGroups = new Set(
-    operations
-      .filter(
-        (operation) =>
-          operation.kind !== "Mutation" && operation.input._tag === "Input"
-      )
-      .map((operation) => operation.identity.groupId)
-  );
   const keyEncoders = new Map<string, RuntimeKeyEncoder>();
-  for (const [groupId, endpoints] of Object.entries(
-    Predicate.isObject(suppliedEncoders) ? suppliedEncoders : {}
-  )) {
-    if (!encoderGroups.has(groupId)) {
-      throw errors.unknownEncoder(JSON.stringify([groupId]));
-    }
-    if (!Predicate.isObject(endpoints)) {
-      throw new TypeError("HTTP key encoders must be grouped by endpoint");
-    }
-    for (const [endpoint, encoder] of Object.entries(endpoints)) {
-      keyEncoders.set(
-        JSON.stringify([groupId, endpoint]),
-        // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
-        encoder as RuntimeKeyEncoder
-      );
+  if (Predicate.isObject(suppliedEncoders)) {
+    const entries = Object.entries(suppliedEncoders);
+    if (entries.length > 0) {
+      const encoderGroups = new Set<string>();
+      for (const operation of operations) {
+        if (operation.kind !== "Mutation" && operation.input._tag === "Input") {
+          encoderGroups.add(operation.identity.groupId);
+        }
+      }
+
+      for (const [groupId, endpoints] of entries) {
+        if (!encoderGroups.has(groupId)) {
+          throw errors.unknownEncoder(JSON.stringify([groupId]));
+        }
+        if (!Predicate.isObject(endpoints)) {
+          throw new TypeError("HTTP key encoders must be grouped by endpoint");
+        }
+
+        for (const [endpoint, encoder] of Object.entries(endpoints)) {
+          keyEncoders.set(
+            JSON.stringify([groupId, endpoint]),
+            // oxlint-disable-next-line anti-slop/require-safety-comment-for-type-assertion, typescript/no-unsafe-type-assertion
+            encoder as RuntimeKeyEncoder
+          );
+        }
+      }
     }
   }
   return { operations, errors, keyEncoders };

@@ -25,20 +25,20 @@ import type {
  */
 export function createRpcQueryUtils<
   const Group extends RpcGroup.Any,
-  // oxlint-disable-next-line typescript/no-generated-empty-object-type -- Generic RPC groups can have no tags.
-  Client extends ReadyRpcClient<RpcsOf<Group>, unknown>,
->(
-  group: Group,
-  options: CreateRpcQueryUtilsClientOptions<Group, readonly [], Client>
-): RpcQueryUtils<Group, readonly [], ExtractRpcClientError<Group, Client>>;
-export function createRpcQueryUtils<
-  const Group extends RpcGroup.Any,
   const Prefix extends KeyPrefix,
   ClientError = never,
 >(
   group: Group,
   options: CreateRpcQueryUtilsOptions<Group, Prefix, ClientError>
 ): RpcQueryUtils<Group, Prefix, ClientError>;
+export function createRpcQueryUtils<
+  const Group extends RpcGroup.Any,
+  // oxlint-disable-next-line typescript/no-generated-empty-object-type -- Generic RPC groups can have no tags.
+  Client extends ReadyRpcClient<RpcsOf<Group>, unknown>,
+>(
+  group: Group,
+  options: CreateRpcQueryUtilsClientOptions<Group, readonly [], Client>
+): RpcQueryUtils<Group, readonly [], ExtractRpcClientError<Group, Client>>;
 export function createRpcQueryUtils<
   const Group extends RpcGroup.Any,
   const Prefix extends KeyPrefix,

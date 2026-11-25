@@ -1,5 +1,5 @@
 import type { DataTag, QueryKey } from "@tanstack/query-core";
-import type { Context, Effect, Schema, SchemaAST, Stream } from "effect";
+import type { Context, Effect, Schema, SchemaAST, Stream, Types } from "effect";
 import type { Headers } from "effect/http";
 import type { Rpc, RpcClient, RpcGroup, RpcSchema } from "effect/rpc";
 
@@ -467,32 +467,35 @@ export type PathTree<
   ClientError,
   Path extends readonly string[] = readonly [],
   Groups extends Record<string, PathEntry> = GroupedPathEntries<Entry>,
+  RootKey extends readonly JsonValue[] = UtilityRootKey<
+    Prefix,
+    readonly ["rpc"]
+  >,
 > = {
-  readonly [Head in keyof Groups & string]: [
-    PathDescendants<Groups[Head], Head>,
-  ] extends [never]
-    ? Groups[Head]["rpc"] extends infer R extends Rpc.Any
-      ? StreamingRpc<R> extends never
-        ? RpcQueryLeaf<R, Prefix, ClientError>
-        : RpcStreamLeaf<R, Prefix, ClientError>
-      : never
-    : {
-        readonly [utilityPaths]?: PathsFromTags<
-          PathDescendants<Groups[Head], Head>["path"]
-        >;
-        readonly key: () => readonly [
-          ...UtilityRootKey<Prefix, readonly ["rpc"]>,
-          ...Path,
-          Head,
-        ];
-        /** Builds native filters for descendant queries. */
-        readonly queryFilter: BranchQueryFilter;
-      } & PathTree<
-        PathDescendants<Groups[Head], Head>,
-        Prefix,
-        ClientError,
-        readonly [...Path, Head]
-      >;
+  readonly [Head in keyof Groups & string]: PathDescendants<
+    Groups[Head],
+    Head
+  > extends infer Descendants extends PathEntry
+    ? [Descendants] extends [never]
+      ? Groups[Head]["rpc"] extends infer R extends Rpc.Any
+        ? StreamingRpc<R> extends never
+          ? RpcQueryLeaf<R, Prefix, ClientError>
+          : RpcStreamLeaf<R, Prefix, ClientError>
+        : never
+      : {
+          readonly [utilityPaths]?: PathsFromTags<Descendants["path"]>;
+          readonly key: () => readonly [...RootKey, ...Path, Head];
+          /** Builds native filters for descendant queries. */
+          readonly queryFilter: BranchQueryFilter;
+        } & PathTree<
+          Descendants,
+          Prefix,
+          ClientError,
+          readonly [...Path, Head],
+          GroupedPathEntries<Descendants>,
+          RootKey
+        >
+    : never;
 };
 
 declare const rpcQueryClientError: unique symbol;
@@ -547,15 +550,17 @@ export type FlatMethodError<Client, Tag extends string> = Client extends (
 export type ExtractRpcClientError<Group extends RpcGroup.Any, Client> =
   Client extends RpcClient.RpcClient.Flat<RpcsOf<Group>, infer E>
     ? E
-    : RpcsOf<Group> extends infer R
-      ? R extends Rpc.Any
-        ? Exclude<
-            | ObjectMethodError<Client, R["_tag"]>
-            | FlatMethodError<Client, R["_tag"]>,
-            DeclaredRpcError<R>
-          >
-        : never
-      : never;
+    : Types.Equals<Client, RpcClient.RpcClient<RpcsOf<Group>>> extends true
+      ? never
+      : RpcsOf<Group> extends infer R
+        ? R extends Rpc.Any
+          ? Exclude<
+              | ObjectMethodError<Client, R["_tag"]>
+              | FlatMethodError<Client, R["_tag"]>,
+              DeclaredRpcError<R>
+            >
+          : never
+        : never;
 
 /** A utility tree with lazy-memoized frozen leaves projected from the group's dotted RPC tags. */
 export type RpcQueryUtils<
@@ -581,33 +586,39 @@ export type NeedsKeyEncoder<R extends Rpc.Any> = [
       : false
   : true;
 
-export type RequiredEncoderRpcs<Group extends RpcGroup.Any> =
-  PayloadBearingRpcs<Group> extends infer R
-    ? R extends Rpc.Any
-      ? NeedsKeyEncoder<R> extends true
-        ? R
-        : never
-      : never
-    : never;
+export type RequiredEncoderRpcsFrom<Eligible> = Eligible extends Rpc.Any
+  ? NeedsKeyEncoder<Eligible> extends true
+    ? Eligible
+    : never
+  : never;
 
-export type KeyEncoders<Group extends RpcGroup.Any> = {
-  readonly [R in RequiredEncoderRpcs<Group> as R["_tag"]]: KeyEncoder<R>;
-} & Partial<{
-  readonly [
-    R in Exclude<
-      PayloadBearingRpcs<Group>,
-      RequiredEncoderRpcs<Group>
-    > as R["_tag"]
-  ]: KeyEncoder<R>;
-}>;
+export type KeyEncodersFrom<
+  Eligible extends Rpc.Any,
+  Required extends Rpc.Any,
+> = ([Required] extends [never]
+  ? unknown
+  : {
+      readonly [R in Required as R["_tag"]]: KeyEncoder<R>;
+    }) &
+  Partial<{
+    readonly [
+      R in [Required] extends [never]
+        ? Eligible
+        : Exclude<Eligible, Required> as R["_tag"]
+    ]: KeyEncoder<R>;
+  }>;
 
 /** Makes the encoder map optional only when no RPC requires an override. */
 export type KeyEncoderOption<Group extends RpcGroup.Any> =
-  KeyEncoderRequirement<
-    PayloadBearingRpcs<Group>,
-    RequiredEncoderRpcs<Group>,
-    KeyEncoders<Group>
-  >;
+  PayloadBearingRpcs<Group> extends infer Eligible extends Rpc.Any
+    ? RequiredEncoderRpcsFrom<Eligible> extends infer Required extends Rpc.Any
+      ? KeyEncoderRequirement<
+          Eligible,
+          Required,
+          KeyEncodersFrom<Eligible, Required>
+        >
+      : never
+    : never;
 
 /** Requires a custom runner when client-side Schema services remain. */
 export type RpcRunnerOption<Group extends RpcGroup.Any> = RunnerRequirement<
@@ -641,7 +652,7 @@ export type CreateRpcQueryUtilsClientOptions<
   Client,
 > = {
   /** A ready tag-keyed or flat RPC client whose Scope remains owned by the caller. */
-  readonly client: Client & ReadyRpcClient<RpcsOf<Group>, unknown>;
+  readonly client: Client;
 } & RpcKeyPrefixOption<Prefix> &
   KeyEncoderOption<Group> &
   RpcRunnerOption<Group>;
