@@ -12,6 +12,7 @@ metadata:
 sources:
   - "**/examples/contracts/src/*.ts"
   - "**/examples/shared/http-workflows/*.ts*"
+  - "e2e/directory-pages.spec.ts"
   - "e2e/http-workflows.spec.ts"
   - "e2e/example-application.ts"
   - "e2e/example-host.ts"
@@ -33,6 +34,7 @@ sources:
   - "**/examples/vite-react/src/components/sections/http-section.tsx"
   - "**/examples/vite-react/src/components/sections/queries-section.tsx"
   - "**/examples/vite-react/src/components/users/user-list.tsx"
+  - "**/examples/vite-react/src/components/users/create-user-form.tsx"
   - "**/examples/vite-react/src/components/sections/mutations-section.tsx"
   - "**/examples/shared/ui/effect-error-details.tsx"
   - "**/examples/vite-react/tests/*.ts*"
@@ -40,6 +42,7 @@ sources:
   - "**/examples/tanstack-start/src/router.tsx"
   - "**/examples/tanstack-start/src/routes/__root.tsx"
   - "**/examples/tanstack-start/src/routes/http.tsx"
+  - "**/examples/tanstack-start/src/routes/index.tsx"
   - "**/examples/tanstack-start/src/components/effect-error-details.tsx"
   - "**/examples/tanstack-start/tests/*.ts*"
   - "**/examples/server/src/*.ts"

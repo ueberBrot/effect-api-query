@@ -1,4 +1,9 @@
-import { User, UserPage } from "@effect-api-query/contracts";
+import {
+  directoryLimits,
+  SeedUser,
+  User,
+  UserPage,
+} from "@effect-api-query/contracts";
 import type {
   InfiniteData,
   MutationObserverOptions,
@@ -186,7 +191,10 @@ export const makeUserWrites = ({
     const dataUpdateCount = query.state.dataUpdateCount + 1;
     queryClient.setQueryData<readonly User[]>(
       key,
-      (users) => (users === undefined ? undefined : edit(users)),
+      (users) =>
+        users === undefined
+          ? undefined
+          : edit(users).slice(0, directoryLimits.firstPageSize),
       { updatedAt: query.state.dataUpdatedAt }
     );
     listWrites.set(query, { dataUpdateCount, writes });
@@ -234,7 +242,7 @@ export const makeUserWrites = ({
       writes.add(write);
     }
     const patched = new UserPage({
-      users,
+      users: users.slice(0, directoryLimits.pageSize),
       total: page.total + (applied ? totalChange : 0),
       nextCursor: page.nextCursor,
     });
@@ -374,6 +382,10 @@ export const makeUserWrites = ({
     readonly name: string;
     readonly locale?: string | undefined;
   }) => {
+    const { locale, name } = new SeedUser({
+      name: input.name,
+      locale: input.locale ?? "en",
+    });
     const write = await begin();
     if (!isActive()) {
       pending.delete(write);
@@ -384,8 +396,8 @@ export const makeUserWrites = ({
       temporary,
       new User({
         ...temporary,
-        name: input.name,
-        locale: input.locale ?? "en",
+        name,
+        locale: locale ?? "en",
       }),
       write,
       1,

@@ -233,7 +233,7 @@ export const QueriesSection = ({
           One directory, two strategies
         </h2>
         <p className="text-muted-foreground mt-2 max-w-3xl leading-7">
-          The ordinary query downloads the full directory. The infinite query
+          The ordinary query downloads a directory preview. The infinite query
           starts with four people and appends one clearly labeled page per
           click.
         </p>
@@ -250,7 +250,7 @@ export const QueriesSection = ({
             </span>
           </div>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
-            Every user arrives together and shares one cache entry.
+            The first directory page shares one cache entry.
           </p>
           {users.isPending ? (
             <p className="text-muted-foreground mt-4 text-sm">Loading users…</p>

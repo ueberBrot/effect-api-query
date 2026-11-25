@@ -155,6 +155,8 @@ A duplicate registration throws `HydrationCodecError` with `DuplicateCodec`. Pre
 
 For public snapshots, select successful queries and require both `state.error` and `state.fetchFailureReason` to be `null`. Query Core can retain a failure reason after status returns to success. To send a public failure, encode both fields separately, allowlist public values and headers, and reconstruct error behavior in the browser.
 
+For a shared directory, fetch a bounded first page in the loader and let the browser request later pages. Bound field lengths in the contract and enforce storage capacity in the shared write path. Successful queries can still contain too much data for a snapshot.
+
 ## Drain request work before disposal
 
 On request completion or abort, stop accepting work. Abort preparation and captures, then cancel queries. Await accepted mutations, preparation, and local finalizers before clearing the private cache and closing the client. Canceling native queries alone can finish too early.

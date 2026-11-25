@@ -12,14 +12,20 @@ import {
   DiagnosticFailure,
   DiagnosticOperationStatus,
   DiagnosticStatus,
+  DirectoryCapacityExceeded,
+  DirectoryFirstPage,
   ExampleAuthorizationError,
   InvalidOperationInput,
+  InvalidUserInput,
   OperationCapacityExceeded,
   OperationId,
   OperationNotFound,
+  SeedUser,
   User,
   UserIdentity,
+  UserLocale,
   UserPage,
+  UserPageInput,
 } from "./contracts.ts";
 
 const unauthorized = ExampleAuthorizationError.pipe(HttpApiSchema.status(401));
@@ -32,21 +38,23 @@ export class ExampleHttpAuthorization extends HttpApiMiddleware.Service<ExampleH
 const missingUser = Schema.Literal("user-not-found").pipe(
   HttpApiSchema.status(404)
 );
+const invalidUser = InvalidUserInput.pipe(HttpApiSchema.status(400));
 
 const users = HttpApiGroup.make("users").add(
-  HttpApiEndpoint.get("list", "/users", { success: Schema.Array(User) }),
+  HttpApiEndpoint.get("list", "/users", { success: DirectoryFirstPage }),
   HttpApiEndpoint.get("get", "/users/:id", {
     params: { id: Schema.Int },
-    query: { locale: Schema.optionalKey(Schema.String) },
+    query: { locale: Schema.optionalKey(UserLocale) },
     success: User,
-    error: missingUser,
+    error: [missingUser, invalidUser],
   }),
   HttpApiEndpoint.post("create", "/users", {
-    payload: Schema.Struct({
-      name: Schema.String,
-      locale: Schema.optionalKey(Schema.String),
-    }),
+    payload: Schema.Struct(SeedUser.fields),
     success: User,
+    error: [
+      invalidUser,
+      DirectoryCapacityExceeded.pipe(HttpApiSchema.status(409)),
+    ],
   }),
   HttpApiEndpoint.delete("delete", "/users/:id", {
     params: { id: Schema.Int },
@@ -55,12 +63,7 @@ const users = HttpApiGroup.make("users").add(
     error: missingUser,
   }).middleware(ExampleHttpAuthorization),
   HttpApiEndpoint.get("page", "/users/page", {
-    query: {
-      cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
-      pageSize: Schema.Int.check(
-        Schema.isBetween({ minimum: 1, maximum: 100 })
-      ),
-    },
+    query: UserPageInput,
     success: UserPage,
   })
 );

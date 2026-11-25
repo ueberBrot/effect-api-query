@@ -1,3 +1,4 @@
+import { directoryLimits } from "@effect-api-query/contracts";
 import {
   describeSlowQueryCancellation,
   useSlowQueryCancellation,
@@ -29,7 +30,7 @@ const HttpPage = () => {
   return (
     <PageLayout
       title="HTTP users"
-      description="The loader prefetched the directory and first page for the browser. HTTP and RPC share the server directory; mutations refresh both caches."
+      description="The loader prefetched a directory preview and the first infinite query page. HTTP and RPC share the server directory."
     >
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
         <HttpDirectory application={application} />
@@ -174,6 +175,7 @@ const HttpRequestInputs = ({
           HTTP name
           <input
             className="border-border-strong bg-muted border p-2"
+            maxLength={directoryLimits.nameLength}
             required
             value={name}
             onChange={(event) => {
@@ -185,6 +187,7 @@ const HttpRequestInputs = ({
           HTTP locale (optional)
           <input
             className="border-border-strong bg-muted border p-2"
+            maxLength={directoryLimits.localeLength}
             value={locale}
             onChange={(event) => {
               setLocale(event.currentTarget.value);

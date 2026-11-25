@@ -5,6 +5,7 @@ export {
   DiagnosticFailure,
   DiagnosticOperationStatus,
   DiagnosticStatus,
+  directoryLimits,
   exampleRpcGroup,
   ExampleAuthorization,
   ExampleAuthorizationError,
@@ -16,6 +17,7 @@ export {
   operationSessionPath,
   SeedUser,
   User,
+  UserLocale,
   UserPage,
 } from "./contracts.ts";
 export type { CommandPayload, SlowDiagnosticInput } from "./contracts.ts";

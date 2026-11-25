@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { ActionButton } from "../components/action-button.tsx";
 import { ConditionalUserQuery } from "../components/conditional-user-query.tsx";
+import { EffectErrorDetails } from "../components/effect-error-details.tsx";
 import { PageLayout, Panel } from "../components/page-layout.tsx";
 import type { TanStackStartApplication } from "../lib/application.ts";
 
@@ -98,15 +99,14 @@ const UsersPage = () => {
 
   return (
     <PageLayout
-      description="See how one cache holds a complete directory, a growing list of pages, a stream history, and the latest live value."
+      description="See how one cache holds a directory preview, a growing list of pages, a stream history, and the latest live value."
       title="Compare full queries, pages, and streams"
     >
       <div className="mt-8 grid gap-5 xl:grid-cols-2">
-        <Panel title="Ordinary query: the complete directory">
+        <Panel title="Ordinary query: directory preview">
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-muted-foreground max-w-xl text-sm leading-6">
-              The loader fetched every record in one request and dehydrated the
-              result for the browser.
+              The loader fetched the first directory page for the browser.
             </p>
             <span className="border-border-strong bg-muted text-text-tertiary border px-3 py-1 text-sm font-bold">
               {String(users.data.length)} users in one response
@@ -150,6 +150,7 @@ const UsersPage = () => {
           {addGrace.isSuccess ? (
             <p className="mt-4 text-sm">Added user {addGrace.data.name}.</p>
           ) : null}
+          <EffectErrorDetails error={addGrace.error} />
         </Panel>
 
         <Panel title="Infinite query: four users at a time">

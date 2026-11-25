@@ -1,3 +1,4 @@
+import { directoryLimits } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
 import { useMutation } from "@tanstack/react-query";
@@ -46,6 +47,7 @@ export const CreateUserForm = ({
           Name
           <input
             className="border-border-strong bg-background text-text-primary placeholder:text-placeholder focus:border-brand-500 focus:ring-brand-500/20 min-w-0 rounded-sm border px-3 py-2.5 outline-none focus:ring-2"
+            maxLength={directoryLimits.nameLength}
             onChange={(event) => {
               setName(event.currentTarget.value);
             }}
@@ -57,6 +59,7 @@ export const CreateUserForm = ({
           Locale (optional)
           <input
             className="border-border-strong bg-background text-text-primary placeholder:text-placeholder focus:border-brand-500 focus:ring-brand-500/20 min-w-0 rounded-sm border px-3 py-2.5 outline-none focus:ring-2"
+            maxLength={directoryLimits.localeLength}
             onChange={(event) => {
               setLocale(event.currentTarget.value);
             }}

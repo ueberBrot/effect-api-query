@@ -1,3 +1,4 @@
+import { directoryLimits } from "@effect-api-query/contracts";
 import type { User } from "@effect-api-query/contracts";
 import { ActionButton } from "@effect-api-query/shared/ui/action-button.tsx";
 import { EffectErrorDetails } from "@effect-api-query/shared/ui/effect-error-details.tsx";
@@ -226,6 +227,7 @@ export const HttpSection = ({
               HTTP name
               <input
                 className="border-border-strong bg-muted border p-2"
+                maxLength={directoryLimits.nameLength}
                 required
                 value={name}
                 onChange={(event) => {
@@ -237,6 +239,7 @@ export const HttpSection = ({
               HTTP locale (optional)
               <input
                 className="border-border-strong bg-muted border p-2"
+                maxLength={directoryLimits.localeLength}
                 value={locale}
                 onChange={(event) => {
                   setLocale(event.currentTarget.value);

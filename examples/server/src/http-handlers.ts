@@ -1,7 +1,6 @@
 import {
   exampleHttpApi,
   ExampleHttpAuthorization,
-  SeedUser,
 } from "@effect-api-query/contracts";
 import { Effect, Layer } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
@@ -17,7 +16,7 @@ const usersRoutes = HttpApiBuilder.group(
     return handlers.handleAll({
       list: () => users.list(),
       get: ({ params, query }) => users.get({ ...params, ...query }),
-      create: ({ payload }) => users.create(new SeedUser(payload)),
+      create: ({ payload }) => users.create(payload),
       delete: ({ params, query }) => users.delete({ ...params, ...query }),
       page: ({ query }) => users.page(query),
     });

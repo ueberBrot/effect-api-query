@@ -2,29 +2,55 @@
 import { Effect, Schema } from "effect";
 import { Rpc, RpcGroup, RpcMiddleware } from "effect/rpc";
 
+export const directoryLimits = {
+  nameLength: 128,
+  localeLength: 32,
+  users: 128,
+  firstPageSize: 16,
+  pageSize: 100,
+} as const;
+
+export const UserLocale = Schema.String.check(
+  Schema.isMaxLength(directoryLimits.localeLength)
+);
+const UserName = Schema.String.check(
+  Schema.isMaxLength(directoryLimits.nameLength)
+);
+
 export const UserIdentity = {
   id: Schema.Int,
-  revision: Schema.NonEmptyString,
+  revision: Schema.NonEmptyString.check(Schema.isMaxLength(64)),
 } as const;
 
 export class User extends Schema.Class<User, { readonly brand: unique symbol }>(
   "User"
 )({
   ...UserIdentity,
-  locale: Schema.String,
-  name: Schema.String,
+  locale: UserLocale,
+  name: UserName,
 }) {}
 
 export class SeedUser extends Schema.Class<
   SeedUser,
   { readonly brand: unique symbol }
 >("SeedUser")({
-  locale: Schema.String.pipe(
+  locale: UserLocale.pipe(
     Schema.optionalKey,
     Schema.withConstructorDefault(Effect.succeed("en"))
   ),
-  name: Schema.String,
+  name: UserName,
 }) {}
+
+export const DirectoryFirstPage = Schema.Array(User).check(
+  Schema.isMaxLength(directoryLimits.firstPageSize)
+);
+
+export const UserPageInput = {
+  cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
+  pageSize: Schema.Int.check(
+    Schema.isBetween({ minimum: 1, maximum: directoryLimits.pageSize })
+  ),
+};
 
 export class UserPage extends Schema.Class<
   UserPage,
@@ -32,8 +58,13 @@ export class UserPage extends Schema.Class<
 >("UserPage")({
   nextCursor: Schema.NullOr(Schema.Int),
   total: Schema.Int,
-  users: Schema.Array(User),
+  users: Schema.Array(User).check(Schema.isMaxLength(directoryLimits.pageSize)),
 }) {}
+
+export const DirectoryCapacityExceeded = Schema.Literal(
+  "directory-capacity-exceeded"
+);
+export const InvalidUserInput = Schema.Literal("invalid-user-input");
 
 // oxlint-disable-next-line unicorn/throw-new-error
 export class DiagnosticFailure extends Schema.TaggedError<
@@ -132,30 +163,28 @@ export type CommandPayload = Rpc.Payload<typeof CommandsStart>;
 const UsersGet = Rpc.make("users.get", {
   payload: {
     id: Schema.Int,
-    locale: Schema.String.pipe(
+    locale: UserLocale.pipe(
       Schema.optionalKey,
       Schema.withConstructorDefault(Effect.succeed("en"))
     ),
   },
   success: User,
-  error: Schema.Literal("user-not-found"),
+  error: Schema.Union([Schema.Literal("user-not-found"), InvalidUserInput]),
 });
 
 const UsersList = Rpc.make("users.list", {
-  success: Schema.Array(User),
+  success: DirectoryFirstPage,
 });
 
 const UsersPage = Rpc.make("users.page", {
-  payload: {
-    cursor: Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)),
-    pageSize: Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 100 })),
-  },
+  payload: UserPageInput,
   success: UserPage,
 });
 
 const UsersCreate = Rpc.make("users.create", {
   payload: SeedUser,
   success: User,
+  error: Schema.Union([InvalidUserInput, DirectoryCapacityExceeded]),
 });
 
 const UsersDelete = Rpc.make("users.delete", {
